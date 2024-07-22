@@ -1,8 +1,8 @@
 {
   "id": "next_pwa",
-  "name": "Default Next PWA",
-  "short_name": "Next PWA",
-  "description": "This next.js app is a PWA.",
+  "name": "Next.js Typescript PWA",
+  "short_name": "NextJS TS PWA",
+  "description": "Starter kit",
   "icons": [
     {
       "src": "./logo72x72.png",

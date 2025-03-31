@@ -5,15 +5,19 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:prod": "ENV=production next build",
+    "build:dev": "ENV=development next build",
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },
   "dependencies": {
-    "next": "15.2.1",
+    "clsx": "^2.1.1",
+    "next": "15.2.3",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
@@ -30,12 +34,9 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-tailwindcss": "^3.18.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
-    "postcss": "8.5.3",
     "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "5.8.2"
   }
 }

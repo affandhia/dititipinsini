@@ -1,9 +1,27 @@
 {
   "recommendations": [
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
+    "binary-ink.dark-modern-oled-theme-set",
     "bradlc.vscode-tailwindcss",
+    "christian-kohler.npm-intellisense",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "editorconfig.editorconfig",
+    "esbenp.prettier-vscode",
+    "formulahendry.auto-rename-tag",
+    "github.copilot",
+    "github.copilot-chat",
+    "humao.rest-client",
+    "isudox.vscode-jetbrains-keybindings",
+    "mhutchie.git-graph",
+    "mikestead.dotenv",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers",
     "ms-vscode.vscode-typescript-next",
-    "formulahendry.auto-rename-tag"
+    "orta.vscode-jest",
+    "redhat.vscode-yaml",
+    "usernamehw.errorlens",
+    "vscode-icons-team.vscode-icons",
+    "xabikos.javascriptsnippets",
+    "yoavbls.pretty-ts-errors",
   ]
 }

@@ -12,31 +12,34 @@
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "clsx": "^2.1.1",
-    "next": "15.2.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "next": "15.4.6",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@eslint/eslintrc": "^3.3.0",
-    "@eslint/js": "^9.22.0",
-    "@types/node": "22.13.10",
-    "@types/react": "19.0.10",
-    "@types/react-dom": "19.0.4",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "eslint": "9.22.0",
-    "eslint-config-next": "15.2.1",
-    "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-import": "^2.31.0",
+    "@eslint/js": "^9.33.0",
+    "@types/node": "22.17.2",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "eslint": "9.33.0",
+    "eslint-config-next": "15.4.6",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
-    "lint-staged": "^15.4.3",
-    "prettier": "^3.5.3",
-    "typescript": "5.8.2"
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2",
+    "typescript": "5.9.2"
   }
 }

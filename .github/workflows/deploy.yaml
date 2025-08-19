@@ -16,13 +16,13 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8.15.6 # match Stackblitz version
+          version: 8 # match Stackblitz version 8.15.6
           run_install: false
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # match Stackblitz version
+          node-version: 20 # match Stackblitz version 20.19.1
           cache: 'pnpm'
 
       - name: Set environment variables

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const {
-  PHASE_DEVELOPMENT_SERVER,
+  /* PHASE_DEVELOPMENT_SERVER, */
   PHASE_PRODUCTION_BUILD,
 } = require('next/constants');
 
@@ -11,7 +12,10 @@ const nextConfig = {
 };
 
 module.exports = (phase) => {
-  if (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_BUILD) {
+  if (
+    // disable PWA in development mode to allow `next dev --turbopack`
+    /* phase === PHASE_DEVELOPMENT_SERVER || */ phase === PHASE_PRODUCTION_BUILD
+  ) {
     const withPWA = require('@ducanh2912/next-pwa').default({
       dest: 'public',
       cacheOnFrontEndNav: true,

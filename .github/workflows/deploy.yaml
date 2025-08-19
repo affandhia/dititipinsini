@@ -2,7 +2,6 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main
       - release
 permissions:
   contents: write
@@ -17,13 +16,13 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 10
+          version: 8.15.6 # match Stackblitz version
           run_install: false
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20 # match Stackblitz version
           cache: 'pnpm'
 
       - name: Set environment variables
@@ -36,7 +35,7 @@ jobs:
           echo "DEPLOY_PATH=out" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build for Production
         if: github.ref == 'refs/heads/release'

@@ -102,6 +102,7 @@ export default [
     rules: {
       'import/no-default-export': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 ];

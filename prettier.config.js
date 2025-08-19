@@ -19,7 +19,7 @@ module.exports = {
   // Plugin configuration
   plugins: ['prettier-plugin-tailwindcss'],
   tailwindStylesheet: './app/globals.css',
-  tailwindFunctions: ['clsx'],
+  tailwindFunctions: ['clsx', 'tw', 'cva', 'cn'],
 
   // Overrides for specific file types
   overrides: [

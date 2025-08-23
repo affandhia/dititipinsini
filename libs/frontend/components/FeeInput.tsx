@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { Plus, BadgePercent, Hash } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from '@/libs/frontend/components/core/button';
@@ -65,11 +65,19 @@ export function FeeInput({
                   if (value) field.onChange(value);
                 }}
               >
-                <ToggleGroupItem value="percentage">
-                  {'Percentage'}
+                <ToggleGroupItem
+                  className="gap- flex basis-auto items-center"
+                  value="percentage"
+                >
+                  <BadgePercent className="h-4 w-4" />
+                  {field.value === 'percentage' && 'Percentage'}
                 </ToggleGroupItem>
-                <ToggleGroupItem value="fixed">
-                  {'Fixed Amount'}
+                <ToggleGroupItem
+                  className="flex basis-auto items-center gap-2"
+                  value="fixed"
+                >
+                  <Hash className="h-4 w-4" />
+                  {field.value === 'fixed' && 'Fixed Amount'}
                 </ToggleGroupItem>
               </ToggleGroup>
             </FormControl>

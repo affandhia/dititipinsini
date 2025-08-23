@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'usehooks-ts';
 
+import { validatedConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
 import { Form } from '@/libs/frontend/components/core/form';
 import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
@@ -19,42 +20,7 @@ import type { z } from 'zod';
 type CalculatorFormValues = z.infer<typeof calculatorSchema>;
 
 // Default state with comprehensive initial values
-const defaultFormValues: CalculatorFormValues = {
-  originalPrice: 0,
-  sourceCurrency: 'SGD',
-  targetCurrency: 'IDR',
-  sourceCurrencyList: ['USD', 'EUR', 'GBP', 'JPY', 'SGD'],
-  targetCurrencyList: ['IDR', 'MYR', 'THB', 'PHP', 'USD'],
-  netFee: { type: 'percentage', value: 10 },
-  baggageFee: { type: 'fixed', value: 50000 },
-  deliveryFee: { type: 'fixed', value: 20000 },
-  packagingFee: { type: 'fixed', value: 5000 },
-  originalPricePresets: [50, 100, 200, 500, 1000],
-  netFeePresets: [
-    { type: 'percentage', value: 5 },
-    { type: 'percentage', value: 10 },
-    { type: 'percentage', value: 15 },
-    { type: 'percentage', value: 20 },
-  ],
-  baggageFeePresets: [
-    { type: 'fixed', value: 25000 },
-    { type: 'fixed', value: 50000 },
-    { type: 'fixed', value: 75000 },
-    { type: 'fixed', value: 100000 },
-  ],
-  deliveryFeePresets: [
-    { type: 'fixed', value: 10000 },
-    { type: 'fixed', value: 20000 },
-    { type: 'fixed', value: 30000 },
-    { type: 'fixed', value: 50000 },
-  ],
-  packagingFeePresets: [
-    { type: 'fixed', value: 5000 },
-    { type: 'fixed', value: 10000 },
-    { type: 'fixed', value: 15000 },
-    { type: 'fixed', value: 20000 },
-  ],
-};
+const defaultFormValues: CalculatorFormValues = validatedConfig;
 
 export function CalculatorCard() {
   // State persistence with useLocalStorage

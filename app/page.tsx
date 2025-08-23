@@ -1,12 +1,13 @@
+'use client';
+
 import React from 'react';
 
-import { Button } from '@/libs/frontend/components/core/button';
+import { CalculatorCard } from '@/libs/frontend/components/CalculatorCard';
 
 export default function Home() {
   return (
-    <main>
-      <h1 className="text-3xl font-bold underline">{'Hello world!'}</h1>
-      <Button variant="outline">{'Get Started'}</Button>
+    <main className="min-h-screen bg-background">
+      <CalculatorCard />
     </main>
   );
 }

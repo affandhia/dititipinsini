@@ -1,7 +1,10 @@
 import React from 'react';
 
-import './globals.css';
+import { QueryClientWrapper } from '@/libs/frontend/components/QueryClientWrapper';
+
 import type { Metadata, Viewport } from 'next';
+
+import './globals.css';
 
 const APP_NAME = 'PWA App';
 const APP_DEFAULT_TITLE = 'My Awesome PWA App';
@@ -55,7 +58,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <QueryClientWrapper>{children}</QueryClientWrapper>
+      </body>
     </html>
   );
 }

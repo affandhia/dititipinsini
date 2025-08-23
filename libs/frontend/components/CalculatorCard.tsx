@@ -67,15 +67,13 @@ export function CalculatorCard() {
   const form = useForm<CalculatorFormValues>({
     resolver: zodResolver(calculatorSchema) as Resolver<CalculatorFormValues>,
     defaultValues: formValues,
+    mode: 'all',
   });
 
-  const { watch, control } = form;
+  const { watch, control, handleSubmit } = form;
 
-  // Watch form changes and save to localStorage
+  // Get current form values without watching for changes
   const watchedValues = watch();
-  //   useEffect(() => {
-  //     setFormValues(watchedValues);
-  //   }, [watchedValues, setFormValues]);
 
   // Currency API for exchange rates
   const { data: exchangeRateData, isLoading: isLoadingRates } = useCurrencyApi(
@@ -198,9 +196,10 @@ export function CalculatorCard() {
 
   const { subtotal, finalTotal, fees } = calculateTotal();
 
-  const onSubmit = () => {
-    // Submit logic can be added here if needed
-    console.warn('Form submitted');
+  const onSubmit = (data: CalculatorFormValues) => {
+    // Save form values to localStorage on submit
+    setFormValues(data);
+    console.warn('Form submitted and saved to localStorage');
   };
 
   const resetForm = () => {
@@ -222,7 +221,7 @@ export function CalculatorCard() {
       </div>
 
       <Form {...form}>
-        <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Left Column - Input Form */}
             <div className="space-y-6">

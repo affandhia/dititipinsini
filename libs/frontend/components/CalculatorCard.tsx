@@ -81,6 +81,34 @@ export function CalculatorCard() {
     }
   };
 
+  // Preset removal function
+  const handleRemovePreset = (
+    field:
+      | 'originalPricePresets'
+      | 'netFeePresets'
+      | 'baggageFeePresets'
+      | 'deliveryFeePresets'
+      | 'packagingFeePresets',
+    index: number
+  ) => {
+    const currentPresets = form.getValues(field);
+
+    if (field === 'originalPricePresets') {
+      const updatedPresets = (currentPresets as number[]).filter(
+        (_, i) => i !== index
+      );
+      form.setValue(field, updatedPresets);
+    } else {
+      const updatedPresets = (
+        currentPresets as {
+          type: 'fixed' | 'percentage';
+          value: number;
+        }[]
+      ).filter((_, i) => i !== index);
+      form.setValue(field, updatedPresets);
+    }
+  };
+
   // Calculation logic
   const calculateTotal = () => {
     const { originalPrice, netFee, baggageFee, deliveryFee, packagingFee } =
@@ -209,6 +237,9 @@ export function CalculatorCard() {
                     onAddPreset={(value) =>
                       handleAddPreset('originalPricePresets', value)
                     }
+                    onRemovePreset={(index) =>
+                      handleRemovePreset('originalPricePresets', index)
+                    }
                   />
 
                   <CurrencySelector
@@ -247,6 +278,9 @@ export function CalculatorCard() {
                     onAddPreset={(value) =>
                       handleAddPreset('netFeePresets', value)
                     }
+                    onRemovePreset={(index) =>
+                      handleRemovePreset('netFeePresets', index)
+                    }
                   />
 
                   <FeeInput
@@ -256,6 +290,9 @@ export function CalculatorCard() {
                     presets={watchedValues.baggageFeePresets}
                     onAddPreset={(value) =>
                       handleAddPreset('baggageFeePresets', value)
+                    }
+                    onRemovePreset={(index) =>
+                      handleRemovePreset('baggageFeePresets', index)
                     }
                   />
 
@@ -267,6 +304,9 @@ export function CalculatorCard() {
                     onAddPreset={(value) =>
                       handleAddPreset('deliveryFeePresets', value)
                     }
+                    onRemovePreset={(index) =>
+                      handleRemovePreset('deliveryFeePresets', index)
+                    }
                   />
 
                   <FeeInput
@@ -276,6 +316,9 @@ export function CalculatorCard() {
                     presets={watchedValues.packagingFeePresets}
                     onAddPreset={(value) =>
                       handleAddPreset('packagingFeePresets', value)
+                    }
+                    onRemovePreset={(index) =>
+                      handleRemovePreset('packagingFeePresets', index)
                     }
                   />
                 </div>

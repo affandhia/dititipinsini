@@ -1,6 +1,7 @@
 'use client';
 
-import { Plus, BadgePercent, Hash } from 'lucide-react';
+import { Plus, BadgePercent, Hash, X, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from '@/libs/frontend/components/core/button';
@@ -31,6 +32,7 @@ interface FeeInputProps {
   label: string;
   presets: FeePreset[];
   onAddPreset: (preset: FeePreset) => void;
+  onRemovePreset: (index: number) => void;
 }
 
 export function FeeInput({
@@ -39,16 +41,57 @@ export function FeeInput({
   label,
   presets,
   onAddPreset,
+  onRemovePreset,
 }: FeeInputProps) {
   const { getValues, setValue } = useFormContext<CalculatorFormValues>();
+  const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(
+    null
+  );
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handlePresetClick = (preset: FeePreset) => {
-    setValue(`${name}.type`, preset.type);
-    setValue(`${name}.value`, preset.value);
+  // Handle clicks outside to reset delete confirmation
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setDeleteConfirmIndex(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handlePresetClick = (preset: FeePreset, index: number) => {
+    if (deleteConfirmIndex === index) {
+      // Second click - delete the preset
+      onRemovePreset(index);
+      setDeleteConfirmIndex(null);
+    } else {
+      // First click - apply the preset
+      setValue(`${name}.type`, preset.type);
+      setValue(`${name}.value`, preset.value);
+    }
+  };
+
+  const handleDeleteClick = (event: React.MouseEvent, index: number) => {
+    event.stopPropagation();
+    if (deleteConfirmIndex === index) {
+      // Confirm deletion
+      onRemovePreset(index);
+      setDeleteConfirmIndex(null);
+    } else {
+      // Enter delete confirmation mode
+      setDeleteConfirmIndex(index);
+    }
   };
 
   return (
-    <div className="space-y-4">
+    <div ref={containerRef} className="space-y-4">
       <div className="font-medium">{label}</div>
 
       <FormField
@@ -134,20 +177,60 @@ export function FeeInput({
 
                 {presets.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {presets.map((preset, index) => (
-                      <Button
-                        key={`${preset.type}-${preset.value}-${index}`}
-                        className="text-xs"
-                        size="sm"
-                        type="button"
-                        variant="secondary"
-                        onClick={() => handlePresetClick(preset)}
-                      >
-                        {preset.type === 'percentage'
-                          ? `${preset.value}%`
-                          : preset.value.toLocaleString()}
-                      </Button>
-                    ))}
+                    {presets.map((preset, index) => {
+                      const isDeleteMode = deleteConfirmIndex === index;
+                      const IconElement = isDeleteMode ? Trash2 : X;
+
+                      // Check if this preset matches current form values
+                      const currentType = getValues(`${name}.type`);
+                      const currentValue = Number(getValues(`${name}.value`));
+                      const isActive =
+                        currentType === preset.type &&
+                        currentValue === preset.value;
+
+                      return (
+                        <div
+                          key={`${preset.type}-${preset.value}-${index}`}
+                          className="group relative"
+                        >
+                          <Button
+                            className={`pr-8 text-xs ${
+                              isDeleteMode
+                                ? 'border-red-300 bg-red-50 text-red-700'
+                                : isActive
+                                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                  : ''
+                            }`}
+                            size="sm"
+                            type="button"
+                            variant={isActive ? 'default' : 'outline'}
+                            onClick={() => handlePresetClick(preset, index)}
+                          >
+                            {preset.type === 'percentage'
+                              ? `${preset.value}%`
+                              : preset.value.toLocaleString()}
+                          </Button>
+
+                          {/* Delete button/icon */}
+                          <button
+                            className={`absolute top-1/2 right-1 -translate-y-1/2 rounded-full p-0.5 transition-all duration-200 ${
+                              isDeleteMode
+                                ? 'text-red-600'
+                                : isActive
+                                  ? 'text-blue-500'
+                                  : ''
+                            }`}
+                            title={
+                              isDeleteMode ? 'Confirm delete' : 'Delete preset'
+                            }
+                            type="button"
+                            onClick={(e) => handleDeleteClick(e, index)}
+                          >
+                            <IconElement className="h-3 w-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

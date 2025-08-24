@@ -1,66 +1,67 @@
 {
   "calculator": {
-    "title": "[TRANSLATE] Advanced Cross-Border Calculator",
-    "description": "[TRANSLATE] Professional personal shopper cost calculator with multi-currency support",
+    "title": "Kalkulator Belanja Lintas Negara",
+    "description": "Kalkulator jastip pro, bisa pakai banyak mata uang",
     "sections": {
-      "itemCurrency": "[TRANSLATE] Item & Currency",
-      "feesCharges": "[TRANSLATE] Fees & Charges"
+      "itemCurrency": "Barang & Mata Uang",
+      "feesCharges": "Biaya & Ongkos",
+      "config": "Konfigurasi"
     },
     "fields": {
-      "originalPrice": "[TRANSLATE] Original Price",
-      "hasDiscount": "[TRANSLATE] Apply Discount",
-      "discountPercentage": "[TRANSLATE] Discount Percentage",
-      "discountedPrice": "[TRANSLATE] Discounted Price",
-      "sourceCurrency": "[TRANSLATE] Source Currency",
-      "targetCurrency": "[TRANSLATE] Target Currency",
-      "exchangeRate": "[TRANSLATE] Exchange Rate",
-      "netFee": "[TRANSLATE] Net Fee",
-      "baggageFee": "[TRANSLATE] Baggage Fee",
-      "deliveryFee": "[TRANSLATE] Delivery Fee",
-      "packagingFee": "[TRANSLATE] Packaging Fee"
+      "originalPrice": "Harga Asli",
+      "hasDiscount": "Pakai Diskon",
+      "discountPercentage": "Persentase Diskon",
+      "discountedPrice": "Harga Setelah Diskon",
+      "sourceCurrency": "Mata Uang Asal",
+      "targetCurrency": "Mata Uang Tujuan",
+      "exchangeRate": "Kurs Tukar",
+      "netFee": "Biaya Jastip (Fee)",
+      "baggageFee": "Biaya Bagasi",
+      "deliveryFee": "Ongkos Kirim (Ongkir)",
+      "packagingFee": "Biaya Packing"
     },
     "actions": {
-      "calculateTotal": "[TRANSLATE] Calculate Total",
-      "reset": "[TRANSLATE] Reset"
+      "calculateTotal": "Hitung Total",
+      "reset": "Reset"
     },
     "status": {
-      "loadingExchangeRates": "[TRANSLATE] Loading exchange rates..."
+      "loadingExchangeRates": "Lagi memuat data kurs..."
     },
     "results": {
-      "costBreakdown": "[TRANSLATE] Cost Breakdown",
-      "originalPrice": "[TRANSLATE] Original Price:",
-      "discountedPrice": "[TRANSLATE] Discounted Price:",
-      "exchangeRate": "[TRANSLATE] Exchange Rate ({{sourceCurrency}} → {{targetCurrency}}):",
-      "convertedBasePrice": "[TRANSLATE] Converted Base Price:",
-      "subtotal": "[TRANSLATE] Subtotal:",
-      "finalTotal": "[TRANSLATE] Final Total:"
+      "costBreakdown": "Rincian Biaya",
+      "originalPrice": "Harga Asli:",
+      "discountedPrice": "Harga Setelah Diskon:",
+      "exchangeRate": "Kurs Tukar ({{sourceCurrency}} → {{targetCurrency}}):",
+      "convertedBasePrice": "Harga Dasar (Setelah Konversi):",
+      "subtotal": "Subtotal:",
+      "finalTotal": "Total Akhir:"
     },
     "feeTypes": {
-      "fixed": "[TRANSLATE] Fixed",
-      "percentage": "[TRANSLATE] Percentage",
-      "fixedAmount": "[TRANSLATE] Fixed Amount"
+      "fixed": "Tetap",
+      "percentage": "Persentase",
+      "fixedAmount": "Nominal Tetap"
     },
     "forms": {
       "placeholders": {
         "exchangeRate": "0.0000",
-        "enterAmount": "[TRANSLATE] Enter amount",
-        "discountPercentage": "[TRANSLATE] Enter discount %",
-        "discountedPrice": "[TRANSLATE] Enter discounted price",
-        "selectCurrency": "[TRANSLATE] Select {{label}}",
-        "searchCurrencies": "[TRANSLATE] Search currencies..."
+        "enterAmount": "Masukkan jumlah",
+        "discountPercentage": "Masukkan diskon %",
+        "discountedPrice": "Masukkan harga setelah diskon",
+        "selectCurrency": "Pilih {{label}}",
+        "searchCurrencies": "Cari mata uang..."
       },
       "labels": {
-        "feeType": "[TRANSLATE] Fee Type",
-        "value": "[TRANSLATE] Value"
+        "feeType": "Jenis Biaya",
+        "value": "Nilai"
       },
       "tooltips": {
-        "confirmDelete": "[TRANSLATE] Confirm delete",
-        "deletePreset": "[TRANSLATE] Delete preset"
+        "confirmDelete": "Konfirmasi hapus",
+        "deletePreset": "Hapus preset"
       }
     },
     "currency": {
-      "addCurrency": "[TRANSLATE] Add Currency",
-      "noCurrencyFound": "[TRANSLATE] No currency found."
+      "addCurrency": "Tambah Mata Uang",
+      "noCurrencyFound": "Mata uang tidak ditemukan."
     }
   }
 }

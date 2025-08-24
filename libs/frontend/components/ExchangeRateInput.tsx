@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from '@/libs/frontend/components/core/form';
 import { Input } from '@/libs/frontend/components/core/input';
+import { useTranslation } from '@/libs/i18n/client';
 
 interface ExchangeRateInputProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -38,6 +39,8 @@ export function ExchangeRateInput<
   onRefresh,
   isLoading = false,
 }: ExchangeRateInputProps<TFieldValues, TName>) {
+  const { t } = useTranslation('common');
+
   return (
     <FormField
       control={control}
@@ -49,7 +52,7 @@ export function ExchangeRateInput<
             <div className="flex gap-2">
               <div className="flex-1">
                 <Input
-                  placeholder="0.0000"
+                  placeholder={t('calculator.forms.placeholders.exchangeRate')}
                   step="any"
                   type="number"
                   {...field}

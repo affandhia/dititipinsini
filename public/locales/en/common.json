@@ -1,0 +1,60 @@
+{
+  "calculator": {
+    "title": "Advanced Cross-Border Calculator",
+    "description": "Professional personal shopper cost calculator with multi-currency support",
+    "sections": {
+      "itemCurrency": "Item & Currency",
+      "feesCharges": "Fees & Charges"
+    },
+    "fields": {
+      "originalPrice": "Original Price",
+      "sourceCurrency": "Source Currency",
+      "targetCurrency": "Target Currency",
+      "exchangeRate": "Exchange Rate",
+      "netFee": "Net Fee",
+      "baggageFee": "Baggage Fee",
+      "deliveryFee": "Delivery Fee",
+      "packagingFee": "Packaging Fee"
+    },
+    "actions": {
+      "calculateTotal": "Calculate Total",
+      "reset": "Reset"
+    },
+    "status": {
+      "loadingExchangeRates": "Loading exchange rates..."
+    },
+    "results": {
+      "costBreakdown": "Cost Breakdown",
+      "originalPrice": "Original Price:",
+      "exchangeRate": "Exchange Rate ({{sourceCurrency}} → {{targetCurrency}}):",
+      "convertedBasePrice": "Converted Base Price:",
+      "subtotal": "Subtotal:",
+      "finalTotal": "Final Total:"
+    },
+    "feeTypes": {
+      "fixed": "Fixed",
+      "percentage": "Percentage",
+      "fixedAmount": "Fixed Amount"
+    },
+    "forms": {
+      "placeholders": {
+        "exchangeRate": "0.0000",
+        "enterAmount": "Enter amount",
+        "selectCurrency": "Select {{label}}",
+        "searchCurrencies": "Search currencies..."
+      },
+      "labels": {
+        "feeType": "Fee Type",
+        "value": "Value"
+      },
+      "tooltips": {
+        "confirmDelete": "Confirm delete",
+        "deletePreset": "Delete preset"
+      }
+    },
+    "currency": {
+      "addCurrency": "Add Currency",
+      "noCurrencyFound": "No currency found."
+    }
+  }
+}

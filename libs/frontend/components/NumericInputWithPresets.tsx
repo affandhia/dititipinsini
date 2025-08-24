@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/libs/frontend/components/core/form';
 import { Input } from '@/libs/frontend/components/core/input';
+import { useTranslation } from '@/libs/i18n/client';
 
 interface NumericInputWithPresetsProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -42,6 +43,7 @@ export function NumericInputWithPresets<
   onAddPreset,
   onRemovePreset,
 }: NumericInputWithPresetsProps<TFieldValues, TName>) {
+  const { t } = useTranslation('common');
   const { getValues } = useFormContext<TFieldValues>();
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(
     null
@@ -105,7 +107,7 @@ export function NumericInputWithPresets<
                 <div className="flex gap-2">
                   <Input
                     min="0"
-                    placeholder="Enter amount"
+                    placeholder={t('calculator.forms.placeholders.enterAmount')}
                     step="0.01"
                     type="number"
                     {...field}
@@ -175,7 +177,9 @@ export function NumericInputWithPresets<
                                   : ''
                             }`}
                             title={
-                              isDeleteMode ? 'Confirm delete' : 'Delete preset'
+                              isDeleteMode
+                                ? t('calculator.forms.tooltips.confirmDelete')
+                                : t('calculator.forms.tooltips.deletePreset')
                             }
                             type="button"
                             onClick={(e) => handleDeleteClick(e, index)}

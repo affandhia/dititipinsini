@@ -1,6 +1,7 @@
 'use client';
 
 import { formatCurrency } from '@/libs/frontend/utils/currency';
+import { useTranslation } from '@/libs/i18n/client';
 
 interface FeeCalculation {
   label: string;
@@ -27,14 +28,18 @@ export function ResultDisplay({
   subtotal,
   finalTotal,
 }: ResultDisplayProps) {
+  const { t } = useTranslation('common');
+
   return (
     <div className="rounded-lg border bg-card p-6 text-card-foreground">
-      <h3 className="mb-4 text-lg font-semibold">{'Cost Breakdown'}</h3>
+      <h3 className="mb-4 text-lg font-semibold">
+        {t('calculator.results.costBreakdown')}
+      </h3>
 
       <div className="space-y-3">
         {/* Original Price */}
         <div className="flex justify-between">
-          <span>{'Original Price:'}</span>
+          <span>{t('calculator.results.originalPrice')}</span>
           <span className="font-medium">
             {formatCurrency(originalPrice, sourceCurrency)}
           </span>
@@ -42,13 +47,18 @@ export function ResultDisplay({
 
         {/* Exchange Rate */}
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>{`Exchange Rate (${sourceCurrency} → ${targetCurrency}):`}</span>
+          <span>
+            {t('calculator.results.exchangeRate', {
+              sourceCurrency,
+              targetCurrency,
+            })}
+          </span>
           <span>{exchangeRate.toFixed(4)}</span>
         </div>
 
         {/* Converted Base Price */}
         <div className="flex justify-between">
-          <span>{'Converted Base Price:'}</span>
+          <span>{t('calculator.results.convertedBasePrice')}</span>
           <span className="font-medium">
             {formatCurrency(originalPrice * exchangeRate, targetCurrency)}
           </span>
@@ -73,7 +83,9 @@ export function ResultDisplay({
 
         {/* Subtotal */}
         <div className="flex justify-between text-lg">
-          <span className="font-semibold">{'Subtotal:'}</span>
+          <span className="font-semibold">
+            {t('calculator.results.subtotal')}
+          </span>
           <span className="font-semibold">
             {formatCurrency(subtotal, targetCurrency)}
           </span>
@@ -81,7 +93,9 @@ export function ResultDisplay({
 
         {/* Final Total */}
         <div className="flex justify-between border-t pt-3 text-xl">
-          <span className="font-bold">{'Final Total:'}</span>
+          <span className="font-bold">
+            {t('calculator.results.finalTotal')}
+          </span>
           <span className="font-bold text-primary">
             {formatCurrency(finalTotal, targetCurrency)}
           </span>

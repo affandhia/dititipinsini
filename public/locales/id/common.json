@@ -1,0 +1,60 @@
+{
+  "calculator": {
+    "title": "[TRANSLATE] Advanced Cross-Border Calculator",
+    "description": "[TRANSLATE] Professional personal shopper cost calculator with multi-currency support",
+    "sections": {
+      "itemCurrency": "[TRANSLATE] Item & Currency",
+      "feesCharges": "[TRANSLATE] Fees & Charges"
+    },
+    "fields": {
+      "originalPrice": "[TRANSLATE] Original Price",
+      "sourceCurrency": "[TRANSLATE] Source Currency",
+      "targetCurrency": "[TRANSLATE] Target Currency",
+      "exchangeRate": "[TRANSLATE] Exchange Rate",
+      "netFee": "[TRANSLATE] Net Fee",
+      "baggageFee": "[TRANSLATE] Baggage Fee",
+      "deliveryFee": "[TRANSLATE] Delivery Fee",
+      "packagingFee": "[TRANSLATE] Packaging Fee"
+    },
+    "actions": {
+      "calculateTotal": "[TRANSLATE] Calculate Total",
+      "reset": "[TRANSLATE] Reset"
+    },
+    "status": {
+      "loadingExchangeRates": "[TRANSLATE] Loading exchange rates..."
+    },
+    "results": {
+      "costBreakdown": "[TRANSLATE] Cost Breakdown",
+      "originalPrice": "[TRANSLATE] Original Price:",
+      "exchangeRate": "[TRANSLATE] Exchange Rate ({{sourceCurrency}} → {{targetCurrency}}):",
+      "convertedBasePrice": "[TRANSLATE] Converted Base Price:",
+      "subtotal": "[TRANSLATE] Subtotal:",
+      "finalTotal": "[TRANSLATE] Final Total:"
+    },
+    "feeTypes": {
+      "fixed": "[TRANSLATE] Fixed",
+      "percentage": "[TRANSLATE] Percentage",
+      "fixedAmount": "[TRANSLATE] Fixed Amount"
+    },
+    "forms": {
+      "placeholders": {
+        "exchangeRate": "0.0000",
+        "enterAmount": "[TRANSLATE] Enter amount",
+        "selectCurrency": "[TRANSLATE] Select {{label}}",
+        "searchCurrencies": "[TRANSLATE] Search currencies..."
+      },
+      "labels": {
+        "feeType": "[TRANSLATE] Fee Type",
+        "value": "[TRANSLATE] Value"
+      },
+      "tooltips": {
+        "confirmDelete": "[TRANSLATE] Confirm delete",
+        "deletePreset": "[TRANSLATE] Delete preset"
+      }
+    },
+    "currency": {
+      "addCurrency": "[TRANSLATE] Add Currency",
+      "noCurrencyFound": "[TRANSLATE] No currency found."
+    }
+  }
+}

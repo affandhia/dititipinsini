@@ -1,11 +1,14 @@
 import React from 'react';
 
 import { QueryClientWrapper } from '@/libs/frontend/components/QueryClientWrapper';
+import { I18nProvider } from '@/libs/i18n/I18nProvider';
 
 import type { Metadata, Viewport } from 'next';
 
 import './globals.css';
 
+// Note: These metadata strings should be localized server-side using Next.js i18n
+// For now, we'll keep them as constants but could be moved to a metadata translation system
 const APP_NAME = 'PWA App';
 const APP_DEFAULT_TITLE = 'My Awesome PWA App';
 const APP_TITLE_TEMPLATE = '%s - PWA App';
@@ -59,7 +62,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryClientWrapper>{children}</QueryClientWrapper>
+        <QueryClientWrapper>
+          <I18nProvider>{children}</I18nProvider>
+        </QueryClientWrapper>
       </body>
     </html>
   );

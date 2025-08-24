@@ -41,6 +41,7 @@ import {
 } from '@/libs/frontend/components/core/select';
 import { cn } from '@/libs/frontend/utils';
 import { WORLD_CURRENCIES } from '@/libs/frontend/utils/currency';
+import { useTranslation } from '@/libs/i18n/client';
 
 interface CurrencySelectorProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -63,6 +64,7 @@ export function CurrencySelector<
   listName,
   label,
 }: CurrencySelectorProps<TFieldValues, TName, TListName>) {
+  const { t } = useTranslation('common');
   const { getValues, setValue } = useFormContext<TFieldValues>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -90,7 +92,12 @@ export function CurrencySelector<
             <FormControl className="flex-1">
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+                  <SelectValue
+                    placeholder={t(
+                      'calculator.forms.placeholders.selectCurrency',
+                      { label: label.toLowerCase() }
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {currencyList.map((currencyCode) => {
@@ -115,12 +122,20 @@ export function CurrencySelector<
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>{'Add Currency'}</DialogTitle>
+                  <DialogTitle>
+                    {t('calculator.currency.addCurrency')}
+                  </DialogTitle>
                 </DialogHeader>
                 <Command>
-                  <CommandInput placeholder="Search currencies..." />
+                  <CommandInput
+                    placeholder={t(
+                      'calculator.forms.placeholders.searchCurrencies'
+                    )}
+                  />
                   <CommandList>
-                    <CommandEmpty>{'No currency found.'}</CommandEmpty>
+                    <CommandEmpty>
+                      {t('calculator.currency.noCurrencyFound')}
+                    </CommandEmpty>
                     <CommandGroup>
                       {WORLD_CURRENCIES.filter(
                         (currency) => !currencyList.includes(currency.code)

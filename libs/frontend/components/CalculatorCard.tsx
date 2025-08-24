@@ -10,6 +10,7 @@ import { validatedConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
 import { Form } from '@/libs/frontend/components/core/form';
 import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
+import { useTranslation } from '@/libs/i18n/client';
 import { calculatorSchema } from '@/schemas/calculatorSchema';
 
 import { CurrencySelector } from './CurrencySelector';
@@ -25,6 +26,8 @@ const defaultFormValues: CalculatorFormValues = validatedConfig;
 
 const FORM_VALUES_KEY = 'calculator-form-state';
 export function CalculatorCard() {
+  const { t } = useTranslation('common');
+
   // State persistence with useLocalStorage
   const [formValues, setFormValues] = useLocalStorage<CalculatorFormValues>(
     FORM_VALUES_KEY,
@@ -167,7 +170,7 @@ export function CalculatorCard() {
     const netFeeAmount =
       netFee.type === 'percentage'
         ? (convertedBasePrice * netFee.value) / 100
-        : netFee.value * exchangeRate;
+        : netFee.value;
 
     const baggageFeeAmount =
       baggageFee.type === 'percentage'
@@ -186,36 +189,36 @@ export function CalculatorCard() {
 
     const fees = [
       {
-        label: 'Net Fee',
+        label: t('calculator.fields.netFee'),
         amount: netFeeAmount,
         displayValue:
           netFee.type === 'percentage'
             ? `${netFee.value}%`
-            : `Fixed ${netFee.value}`,
+            : `${t('calculator.feeTypes.fixed')} ${netFee.value}`,
       },
       {
-        label: 'Baggage Fee',
+        label: t('calculator.fields.baggageFee'),
         amount: baggageFeeAmount,
         displayValue:
           baggageFee.type === 'percentage'
             ? `${baggageFee.value}%`
-            : `Fixed ${baggageFee.value}`,
+            : `${t('calculator.feeTypes.fixed')} ${baggageFee.value}`,
       },
       {
-        label: 'Delivery Fee',
+        label: t('calculator.fields.deliveryFee'),
         amount: deliveryFeeAmount,
         displayValue:
           deliveryFee.type === 'percentage'
             ? `${deliveryFee.value}%`
-            : `Fixed ${deliveryFee.value}`,
+            : `${t('calculator.feeTypes.fixed')} ${deliveryFee.value}`,
       },
       {
-        label: 'Packaging Fee',
+        label: t('calculator.fields.packagingFee'),
         amount: packagingFeeAmount,
         displayValue:
           packagingFee.type === 'percentage'
             ? `${packagingFee.value}%`
-            : `Fixed ${packagingFee.value}`,
+            : `${t('calculator.feeTypes.fixed')} ${packagingFee.value}`,
       },
     ];
 
@@ -247,14 +250,8 @@ export function CalculatorCard() {
   return (
     <div className="mx-auto max-w-4xl space-y-8 p-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">
-          {'Advanced Cross-Border Calculator'}
-        </h1>
-        <p className="text-muted-foreground">
-          {
-            'Professional personal shopper cost calculator with multi-currency support'
-          }
-        </p>
+        <h1 className="text-3xl font-bold">{t('calculator.title')}</h1>
+        <p className="text-muted-foreground">{t('calculator.description')}</p>
       </div>
 
       <Form {...form}>
@@ -264,13 +261,13 @@ export function CalculatorCard() {
             <div className="space-y-6">
               <div className="rounded-lg border bg-card p-6 text-card-foreground">
                 <h2 className="mb-4 text-xl font-semibold">
-                  {'Item & Currency'}
+                  {t('calculator.sections.itemCurrency')}
                 </h2>
 
                 <div className="space-y-4">
                   <NumericInputWithPresets
                     control={control}
-                    label="Original Price"
+                    label={t('calculator.fields.originalPrice')}
                     name="originalPrice"
                     presets={watchedValues.originalPricePresets}
                     onAddPreset={(value) =>
@@ -283,14 +280,14 @@ export function CalculatorCard() {
 
                   <CurrencySelector
                     control={control}
-                    label="Source Currency"
+                    label={t('calculator.fields.sourceCurrency')}
                     listName="sourceCurrencyList"
                     name="sourceCurrency"
                   />
 
                   <CurrencySelector
                     control={control}
-                    label="Target Currency"
+                    label={t('calculator.fields.targetCurrency')}
                     listName="targetCurrencyList"
                     name="targetCurrency"
                   />
@@ -298,7 +295,7 @@ export function CalculatorCard() {
                   <ExchangeRateInput
                     control={control}
                     isLoading={isLoadingRates}
-                    label="Exchange Rate"
+                    label={t('calculator.fields.exchangeRate')}
                     name="exchangeRate"
                     sourceCurrency={watchedValues.sourceCurrency}
                     targetCurrency={watchedValues.targetCurrency}
@@ -307,7 +304,7 @@ export function CalculatorCard() {
 
                   {isLoadingRates && (
                     <div className="text-sm text-muted-foreground">
-                      {'Loading exchange rates...'}
+                      {t('calculator.status.loadingExchangeRates')}
                     </div>
                   )}
                 </div>
@@ -315,13 +312,13 @@ export function CalculatorCard() {
 
               <div className="rounded-lg border bg-card p-6 text-card-foreground">
                 <h2 className="mb-4 text-xl font-semibold">
-                  {'Fees & Charges'}
+                  {t('calculator.sections.feesCharges')}
                 </h2>
 
                 <div className="space-y-6">
                   <FeeInput
                     control={control}
-                    label="Net Fee"
+                    label={t('calculator.fields.netFee')}
                     name="netFee"
                     presets={watchedValues.netFeePresets}
                     onAddPreset={(value) =>
@@ -334,7 +331,7 @@ export function CalculatorCard() {
 
                   <FeeInput
                     control={control}
-                    label="Baggage Fee"
+                    label={t('calculator.fields.baggageFee')}
                     name="baggageFee"
                     presets={watchedValues.baggageFeePresets}
                     onAddPreset={(value) =>
@@ -347,7 +344,7 @@ export function CalculatorCard() {
 
                   <FeeInput
                     control={control}
-                    label="Delivery Fee"
+                    label={t('calculator.fields.deliveryFee')}
                     name="deliveryFee"
                     presets={watchedValues.deliveryFeePresets}
                     onAddPreset={(value) =>
@@ -360,7 +357,7 @@ export function CalculatorCard() {
 
                   <FeeInput
                     control={control}
-                    label="Packaging Fee"
+                    label={t('calculator.fields.packagingFee')}
                     name="packagingFee"
                     presets={watchedValues.packagingFeePresets}
                     onAddPreset={(value) =>
@@ -375,10 +372,10 @@ export function CalculatorCard() {
 
               <div className="flex gap-4">
                 <Button className="flex-1" type="submit">
-                  {'Calculate Total'}
+                  {t('calculator.actions.calculateTotal')}
                 </Button>
                 <Button type="button" variant="outline" onClick={resetForm}>
-                  {'Reset'}
+                  {t('calculator.actions.reset')}
                 </Button>
               </div>
             </div>

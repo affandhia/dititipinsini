@@ -17,6 +17,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@/libs/frontend/components/core/toggle-group';
+import { useTranslation } from '@/libs/i18n/client';
 
 import type { CalculatorFormValues } from '@/schemas/calculatorSchema';
 import type { Control } from 'react-hook-form';
@@ -43,6 +44,7 @@ export function FeeInput({
   onAddPreset,
   onRemovePreset,
 }: FeeInputProps) {
+  const { t } = useTranslation('common');
   const { getValues, setValue } = useFormContext<CalculatorFormValues>();
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(
     null
@@ -99,7 +101,7 @@ export function FeeInput({
         name={`${name}.type`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{'Fee Type'}</FormLabel>
+            <FormLabel>{t('calculator.forms.labels.feeType')}</FormLabel>
             <FormControl>
               <ToggleGroup
                 type="single"
@@ -113,14 +115,16 @@ export function FeeInput({
                   value="percentage"
                 >
                   <BadgePercent className="h-4 w-4" />
-                  {field.value === 'percentage' && 'Percentage'}
+                  {field.value === 'percentage' &&
+                    t('calculator.feeTypes.percentage')}
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   className="flex basis-auto items-center gap-2"
                   value="fixed"
                 >
                   <Hash className="h-4 w-4" />
-                  {field.value === 'fixed' && 'Fixed Amount'}
+                  {field.value === 'fixed' &&
+                    t('calculator.feeTypes.fixedAmount')}
                 </ToggleGroupItem>
               </ToggleGroup>
             </FormControl>
@@ -133,13 +137,13 @@ export function FeeInput({
         name={`${name}.value`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{'Value'}</FormLabel>
+            <FormLabel>{t('calculator.forms.labels.value')}</FormLabel>
             <FormControl>
               <div className="space-y-3">
                 <div className="flex gap-2">
                   <Input
                     min="0"
-                    placeholder="Enter amount"
+                    placeholder={t('calculator.forms.placeholders.enterAmount')}
                     step="0.01"
                     type="number"
                     {...field}
@@ -221,7 +225,9 @@ export function FeeInput({
                                   : ''
                             }`}
                             title={
-                              isDeleteMode ? 'Confirm delete' : 'Delete preset'
+                              isDeleteMode
+                                ? t('calculator.forms.tooltips.confirmDelete')
+                                : t('calculator.forms.tooltips.deletePreset')
                             }
                             type="button"
                             onClick={(e) => handleDeleteClick(e, index)}

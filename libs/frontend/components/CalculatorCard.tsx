@@ -1,8 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
-import { useLocalStorage } from 'usehooks-ts';
+import { useLocalStorage } from 'react-use';
+import { type z } from 'zod';
 
 import { validatedConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
@@ -15,17 +17,16 @@ import { FeeInput } from './FeeInput';
 import { NumericInputWithPresets } from './NumericInputWithPresets';
 import { ResultDisplay } from './ResultDisplay';
 
-import type { z } from 'zod';
-
 type CalculatorFormValues = z.infer<typeof calculatorSchema>;
 
 // Default state with comprehensive initial values
 const defaultFormValues: CalculatorFormValues = validatedConfig;
 
+const FORM_VALUES_KEY = 'calculator-form-state';
 export function CalculatorCard() {
   // State persistence with useLocalStorage
   const [formValues, setFormValues] = useLocalStorage<CalculatorFormValues>(
-    'calculator-form-state',
+    FORM_VALUES_KEY,
     defaultFormValues
   );
 
@@ -40,6 +41,9 @@ export function CalculatorCard() {
 
   // Get current form values without watching for changes
   const watchedValues = watch();
+  useEffect(() => {
+    localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(watchedValues));
+  }, [watchedValues]);
 
   // Currency API for exchange rates
   const { data: exchangeRateData, isLoading: isLoadingRates } = useCurrencyApi(

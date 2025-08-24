@@ -13,6 +13,7 @@ import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
 import { calculatorSchema } from '@/schemas/calculatorSchema';
 
 import { CurrencySelector } from './CurrencySelector';
+import { ExchangeRateInput } from './ExchangeRateInput';
 import { FeeInput } from './FeeInput';
 import { NumericInputWithPresets } from './NumericInputWithPresets';
 import { ResultDisplay } from './ResultDisplay';
@@ -46,15 +47,53 @@ export function CalculatorCard() {
   }, [watchedValues]);
 
   // Currency API for exchange rates
-  const { data: exchangeRateData, isLoading: isLoadingRates } = useCurrencyApi(
-    watchedValues.sourceCurrency
-  );
+  const {
+    data: exchangeRateData,
+    isLoading: isLoadingRates,
+    refetch: refetchExchangeRate,
+  } = useCurrencyApi(watchedValues.sourceCurrency);
 
-  // Calculate exchange rate
+  // Auto-update exchange rate when API data changes
+  useEffect(() => {
+    if (
+      exchangeRateData &&
+      watchedValues.sourceCurrency &&
+      watchedValues.targetCurrency
+    ) {
+      const apiRate =
+        exchangeRateData[watchedValues.sourceCurrency.toLowerCase()]?.[
+          watchedValues.targetCurrency.toLowerCase()
+        ];
+      form.setValue('exchangeRate', apiRate);
+    }
+  }, [
+    exchangeRateData,
+    watchedValues.sourceCurrency,
+    watchedValues.targetCurrency,
+    form,
+  ]);
+
+  // Function to refresh exchange rate from API
+  const handleRefreshExchangeRate = async () => {
+    const result = await refetchExchangeRate();
+    if (result.data) {
+      const apiRate =
+        result.data[watchedValues.sourceCurrency.toLowerCase()]?.[
+          watchedValues.targetCurrency.toLowerCase()
+        ];
+      if (apiRate) {
+        form.setValue('exchangeRate', apiRate);
+      }
+    }
+  };
+
+  // Use form exchange rate, fallback to API rate if form rate is not set
   const exchangeRate =
+    watchedValues.exchangeRate ||
     exchangeRateData?.[watchedValues.sourceCurrency.toLowerCase()]?.[
       watchedValues.targetCurrency.toLowerCase()
-    ] || 1;
+    ] ||
+    1;
 
   // Preset management function
   const handleAddPreset = (
@@ -254,6 +293,16 @@ export function CalculatorCard() {
                     label="Target Currency"
                     listName="targetCurrencyList"
                     name="targetCurrency"
+                  />
+
+                  <ExchangeRateInput
+                    control={control}
+                    isLoading={isLoadingRates}
+                    label="Exchange Rate"
+                    name="exchangeRate"
+                    sourceCurrency={watchedValues.sourceCurrency}
+                    targetCurrency={watchedValues.targetCurrency}
+                    onRefresh={handleRefreshExchangeRate}
                   />
 
                   {isLoadingRates && (

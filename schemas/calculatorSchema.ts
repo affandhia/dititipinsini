@@ -9,6 +9,7 @@ export const calculatorSchema = z.object({
   originalPrice: z.coerce.number().positive('Price must be positive.'),
   sourceCurrency: z.string().min(3, 'Please select a currency.'),
   targetCurrency: z.string().min(3, 'Please select a currency.'),
+  exchangeRate: z.coerce.number().positive('Exchange rate must be positive.'),
   sourceCurrencyList: z.array(z.string()),
   targetCurrencyList: z.array(z.string()),
   netFee: feeSchema,

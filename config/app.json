@@ -2,6 +2,7 @@
   "originalPrice": 10,
   "sourceCurrency": "SGD",
   "targetCurrency": "IDR",
+  "exchangeRate": 1,
   "sourceCurrencyList": ["USD", "EUR", "GBP", "JPY", "SGD"],
   "targetCurrencyList": ["IDR", "MYR", "THB", "PHP", "USD"],
   "netFee": { "type": "percentage", "value": 10 },

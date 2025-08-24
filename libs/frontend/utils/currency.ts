@@ -164,6 +164,14 @@ export const WORLD_CURRENCIES = [
   { code: 'ZWL', name: 'Zimbabwean Dollar', symbol: 'Z$' },
 ];
 
+// Special formatting rules for currencies
+const SPECIAL_CURRENCY_FORMATTING = {
+  IDR: { minimumFractionDigits: 0, maximumFractionDigits: 0 }, // Indonesian Rupiah - no decimal places
+  // Add more currencies here as needed
+  // JPY: { minimumFractionDigits: 0, maximumFractionDigits: 0 }, // Japanese Yen
+  // KRW: { minimumFractionDigits: 0, maximumFractionDigits: 0 }, // South Korean Won
+} as const;
+
 // Currency formatting utility
 export const formatCurrency = (
   amount: number,
@@ -171,11 +179,27 @@ export const formatCurrency = (
   locale: string = 'en-US'
 ): string => {
   try {
+    const upperCurrencyCode = currencyCode.toUpperCase();
+    const specialFormatting =
+      SPECIAL_CURRENCY_FORMATTING[
+        upperCurrencyCode as keyof typeof SPECIAL_CURRENCY_FORMATTING
+      ];
+
+    // Use special formatting if available, otherwise default to 2 decimal places
+    const fractionDigits = specialFormatting
+      ? {
+          minimumFractionDigits: specialFormatting.minimumFractionDigits,
+          maximumFractionDigits: specialFormatting.maximumFractionDigits,
+        }
+      : {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        };
+
     return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currencyCode.toUpperCase(),
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency: upperCurrencyCode,
+      ...fractionDigits,
     }).format(amount);
   } catch (_error) {
     // Fallback formatting if currency code is not supported
@@ -183,10 +207,24 @@ export const formatCurrency = (
       (c) => c.code.toLowerCase() === currencyCode.toLowerCase()
     );
     const symbol = currency?.symbol || currencyCode.toUpperCase();
-    return `${symbol} ${amount.toLocaleString(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+    const upperCurrencyCode = currencyCode.toUpperCase();
+    const specialFormatting =
+      SPECIAL_CURRENCY_FORMATTING[
+        upperCurrencyCode as keyof typeof SPECIAL_CURRENCY_FORMATTING
+      ];
+
+    // Use special formatting if available, otherwise default to 2 decimal places
+    const fractionDigits = specialFormatting
+      ? {
+          minimumFractionDigits: specialFormatting.minimumFractionDigits,
+          maximumFractionDigits: specialFormatting.maximumFractionDigits,
+        }
+      : {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        };
+
+    return `${symbol} ${amount.toLocaleString(locale, fractionDigits)}`;
   }
 };
 

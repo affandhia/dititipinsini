@@ -343,7 +343,7 @@ export function CalculatorCard() {
         </div>
 
         {/* Snap point indicators */}
-        <div className="mb-20 flex justify-center space-x-2">
+        <div className="mb-80 flex justify-center space-x-2">
           {DRAWER_SNAP_POINTS.map((point) => (
             <button
               key={point}

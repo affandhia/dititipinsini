@@ -10,8 +10,8 @@ i18n.use(initReactI18next).init({
     en: { common: {} },
     id: { common: {} },
   },
-  lng: 'en', // default language
-  fallbackLng: 'en',
+  lng: 'id', // default language
+  fallbackLng: 'id',
   debug: process.env.NODE_ENV === 'development',
 
   interpolation: {

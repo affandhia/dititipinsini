@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'react-use';
 import { type z } from 'zod';
@@ -9,6 +9,12 @@ import { type z } from 'zod';
 import { validatedConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
 import { Checkbox } from '@/libs/frontend/components/core/checkbox';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerClose,
+} from '@/libs/frontend/components/core/drawer';
 import {
   Form,
   FormField,
@@ -33,8 +39,22 @@ type CalculatorFormValues = z.infer<typeof calculatorSchema>;
 const defaultFormValues: CalculatorFormValues = validatedConfig;
 
 const FORM_VALUES_KEY = 'calculator-form-state';
+const DRAWER_SNAP_POINTS = [0.5, 0.8, 1]; // 50%, 70%, and 100% of screen height
+const DRAWER_FADE_FROM_INDEX = 2; // Start fading overlay from the second snap point (50%)
+
 export function CalculatorCard() {
   const { t } = useTranslation('common');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+
+  // Snap points configuration for Google Maps-like behavior
+  const [activeSnapPoint, setActiveSnapPoint] = useState(DRAWER_SNAP_POINTS[0]); // Start at 50%
+
+  // Handle snap point changes with proper typing
+  const handleSnapPointChange = (snapPoint: string | number | null) => {
+    if (typeof snapPoint === 'number') {
+      setActiveSnapPoint(snapPoint);
+    }
+  };
 
   // State persistence with useLocalStorage
   const [formValues, setFormValues] = useLocalStorage<CalculatorFormValues>(
@@ -298,234 +318,281 @@ export function CalculatorCard() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 p-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">{t('calculator.title')}</h1>
-        <p className="text-muted-foreground">{t('calculator.description')}</p>
+    <>
+      {/* Main Content - ResultDisplay */}
+      <div className="mx-auto max-w-4xl space-y-8 p-6">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">{t('calculator.title')}</h1>
+          <p className="text-muted-foreground">{t('calculator.description')}</p>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="w-full max-w-2xl">
+            <ResultDisplay
+              discountedPrice={watchedValues.discountedPrice}
+              exchangeRate={exchangeRate}
+              fees={fees}
+              finalTotal={finalTotal}
+              hasDiscount={watchedValues.hasDiscount}
+              originalPrice={watchedValues.originalPrice}
+              sourceCurrency={watchedValues.sourceCurrency}
+              subtotal={subtotal}
+              targetCurrency={watchedValues.targetCurrency}
+            />
+          </div>
+        </div>
+
+        {/* Snap point indicators */}
+        <div className="mb-20 flex justify-center space-x-2">
+          {DRAWER_SNAP_POINTS.map((point) => (
+            <button
+              key={point}
+              className={`h-3 w-3 rounded-full transition-colors ${
+                activeSnapPoint === point
+                  ? 'bg-primary'
+                  : 'bg-muted-foreground/30'
+              }`}
+              onClick={() => {
+                setIsDrawerOpen(true);
+                handleSnapPointChange(point);
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      <Form {...form}>
-        <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Left Column - Input Form */}
-            <div className="space-y-6">
-              <div className="rounded-lg border bg-card p-6 text-card-foreground">
-                <h2 className="mb-4 text-xl font-semibold">
-                  {t('calculator.sections.itemCurrency')}
-                </h2>
+      {/* Bottom Drawer with Form */}
+      <Drawer
+        activeSnapPoint={activeSnapPoint}
+        fadeFromIndex={DRAWER_FADE_FROM_INDEX}
+        modal={false}
+        open={isDrawerOpen}
+        setActiveSnapPoint={handleSnapPointChange}
+        snapPoints={DRAWER_SNAP_POINTS}
+        onOpenChange={setIsDrawerOpen}
+      >
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader></DrawerHeader>
 
-                <div className="space-y-4">
-                  <NumericInputWithPresets
-                    control={control}
-                    label={t('calculator.fields.originalPrice')}
-                    name="originalPrice"
-                    presets={watchedValues.originalPricePresets}
-                    onAddPreset={(value) =>
-                      handleAddPreset('originalPricePresets', value)
-                    }
-                    onRemovePreset={(index) =>
-                      handleRemovePreset('originalPricePresets', index)
-                    }
-                  />
+          <div className="overflow-y-auto px-4 pb-4">
+            <Form {...form}>
+              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Left Column - Item & Currency */}
+                  <div className="space-y-6">
+                    <div className="rounded-lg border bg-card p-4 text-card-foreground">
+                      <h3 className="mb-4 text-lg font-semibold">
+                        {t('calculator.sections.itemCurrency')}
+                      </h3>
 
-                  {/* Discount Section */}
-                  <FormField
-                    control={control}
-                    name="hasDiscount"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center space-y-0 space-x-3">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                          {t('calculator.fields.hasDiscount')}
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
+                      <div className="space-y-4">
+                        <NumericInputWithPresets
+                          control={control}
+                          label={t('calculator.fields.originalPrice')}
+                          name="originalPrice"
+                          presets={watchedValues.originalPricePresets}
+                          onAddPreset={(value) =>
+                            handleAddPreset('originalPricePresets', value)
+                          }
+                          onRemovePreset={(index) =>
+                            handleRemovePreset('originalPricePresets', index)
+                          }
+                        />
 
-                  {hasDiscount && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={control}
-                        name="discountPercentage"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t('calculator.fields.discountPercentage')}
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                max="100"
-                                min="0"
-                                placeholder={t(
-                                  'calculator.forms.placeholders.discountPercentage'
-                                )}
-                                step="0.1"
-                                type="number"
-                                onChange={(e) =>
-                                  handleDiscountPercentageChange(
-                                    Number(e.target.value)
-                                  )
-                                }
-                              />
-                            </FormControl>
-                          </FormItem>
+                        {/* Discount Section */}
+                        <FormField
+                          control={control}
+                          name="hasDiscount"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center space-y-0 space-x-3">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                {t('calculator.fields.hasDiscount')}
+                              </FormLabel>
+                            </FormItem>
+                          )}
+                        />
+
+                        {hasDiscount && (
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={control}
+                              name="discountPercentage"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    {t('calculator.fields.discountPercentage')}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      max="100"
+                                      min="0"
+                                      placeholder={t(
+                                        'calculator.forms.placeholders.discountPercentage'
+                                      )}
+                                      step="0.1"
+                                      type="number"
+                                      onChange={(e) =>
+                                        handleDiscountPercentageChange(
+                                          Number(e.target.value)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={control}
+                              name="discountedPrice"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    {t('calculator.fields.discountedPrice')}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      min="0"
+                                      placeholder={t(
+                                        'calculator.forms.placeholders.discountedPrice'
+                                      )}
+                                      step="0.01"
+                                      type="number"
+                                      onChange={(e) =>
+                                        handleDiscountedPriceChange(
+                                          Number(e.target.value)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
                         )}
-                      />
-                      <FormField
-                        control={control}
-                        name="discountedPrice"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t('calculator.fields.discountedPrice')}
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                min="0"
-                                placeholder={t(
-                                  'calculator.forms.placeholders.discountedPrice'
-                                )}
-                                step="0.01"
-                                type="number"
-                                onChange={(e) =>
-                                  handleDiscountedPriceChange(
-                                    Number(e.target.value)
-                                  )
-                                }
-                              />
-                            </FormControl>
-                          </FormItem>
+
+                        <CurrencySelector
+                          control={control}
+                          label={t('calculator.fields.sourceCurrency')}
+                          listName="sourceCurrencyList"
+                          name="sourceCurrency"
+                        />
+
+                        <CurrencySelector
+                          control={control}
+                          label={t('calculator.fields.targetCurrency')}
+                          listName="targetCurrencyList"
+                          name="targetCurrency"
+                        />
+
+                        <ExchangeRateInput
+                          control={control}
+                          isLoading={isLoadingRates}
+                          label={t('calculator.fields.exchangeRate')}
+                          name="exchangeRate"
+                          sourceCurrency={watchedValues.sourceCurrency}
+                          targetCurrency={watchedValues.targetCurrency}
+                          onRefresh={handleRefreshExchangeRate}
+                        />
+
+                        {isLoadingRates && (
+                          <div className="text-sm text-muted-foreground">
+                            {t('calculator.status.loadingExchangeRates')}
+                          </div>
                         )}
-                      />
+                      </div>
                     </div>
-                  )}
+                  </div>
 
-                  <CurrencySelector
-                    control={control}
-                    label={t('calculator.fields.sourceCurrency')}
-                    listName="sourceCurrencyList"
-                    name="sourceCurrency"
-                  />
+                  {/* Right Column - Fees */}
+                  <div className="space-y-6">
+                    <div className="rounded-lg border bg-card p-4 text-card-foreground">
+                      <h3 className="mb-4 text-lg font-semibold">
+                        {t('calculator.sections.feesCharges')}
+                      </h3>
 
-                  <CurrencySelector
-                    control={control}
-                    label={t('calculator.fields.targetCurrency')}
-                    listName="targetCurrencyList"
-                    name="targetCurrency"
-                  />
+                      <div className="space-y-6">
+                        <FeeInput
+                          control={control}
+                          label={t('calculator.fields.netFee')}
+                          name="netFee"
+                          presets={watchedValues.netFeePresets}
+                          onAddPreset={(value) =>
+                            handleAddPreset('netFeePresets', value)
+                          }
+                          onRemovePreset={(index) =>
+                            handleRemovePreset('netFeePresets', index)
+                          }
+                        />
 
-                  <ExchangeRateInput
-                    control={control}
-                    isLoading={isLoadingRates}
-                    label={t('calculator.fields.exchangeRate')}
-                    name="exchangeRate"
-                    sourceCurrency={watchedValues.sourceCurrency}
-                    targetCurrency={watchedValues.targetCurrency}
-                    onRefresh={handleRefreshExchangeRate}
-                  />
+                        <FeeInput
+                          control={control}
+                          label={t('calculator.fields.baggageFee')}
+                          name="baggageFee"
+                          presets={watchedValues.baggageFeePresets}
+                          onAddPreset={(value) =>
+                            handleAddPreset('baggageFeePresets', value)
+                          }
+                          onRemovePreset={(index) =>
+                            handleRemovePreset('baggageFeePresets', index)
+                          }
+                        />
 
-                  {isLoadingRates && (
-                    <div className="text-sm text-muted-foreground">
-                      {t('calculator.status.loadingExchangeRates')}
+                        <FeeInput
+                          control={control}
+                          label={t('calculator.fields.deliveryFee')}
+                          name="deliveryFee"
+                          presets={watchedValues.deliveryFeePresets}
+                          onAddPreset={(value) =>
+                            handleAddPreset('deliveryFeePresets', value)
+                          }
+                          onRemovePreset={(index) =>
+                            handleRemovePreset('deliveryFeePresets', index)
+                          }
+                        />
+
+                        <FeeInput
+                          control={control}
+                          label={t('calculator.fields.packagingFee')}
+                          name="packagingFee"
+                          presets={watchedValues.packagingFeePresets}
+                          onAddPreset={(value) =>
+                            handleAddPreset('packagingFeePresets', value)
+                          }
+                          onRemovePreset={(index) =>
+                            handleRemovePreset('packagingFeePresets', index)
+                          }
+                        />
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="rounded-lg border bg-card p-6 text-card-foreground">
-                <h2 className="mb-4 text-xl font-semibold">
-                  {t('calculator.sections.feesCharges')}
-                </h2>
-
-                <div className="space-y-6">
-                  <FeeInput
-                    control={control}
-                    label={t('calculator.fields.netFee')}
-                    name="netFee"
-                    presets={watchedValues.netFeePresets}
-                    onAddPreset={(value) =>
-                      handleAddPreset('netFeePresets', value)
-                    }
-                    onRemovePreset={(index) =>
-                      handleRemovePreset('netFeePresets', index)
-                    }
-                  />
-
-                  <FeeInput
-                    control={control}
-                    label={t('calculator.fields.baggageFee')}
-                    name="baggageFee"
-                    presets={watchedValues.baggageFeePresets}
-                    onAddPreset={(value) =>
-                      handleAddPreset('baggageFeePresets', value)
-                    }
-                    onRemovePreset={(index) =>
-                      handleRemovePreset('baggageFeePresets', index)
-                    }
-                  />
-
-                  <FeeInput
-                    control={control}
-                    label={t('calculator.fields.deliveryFee')}
-                    name="deliveryFee"
-                    presets={watchedValues.deliveryFeePresets}
-                    onAddPreset={(value) =>
-                      handleAddPreset('deliveryFeePresets', value)
-                    }
-                    onRemovePreset={(index) =>
-                      handleRemovePreset('deliveryFeePresets', index)
-                    }
-                  />
-
-                  <FeeInput
-                    control={control}
-                    label={t('calculator.fields.packagingFee')}
-                    name="packagingFee"
-                    presets={watchedValues.packagingFeePresets}
-                    onAddPreset={(value) =>
-                      handleAddPreset('packagingFeePresets', value)
-                    }
-                    onRemovePreset={(index) =>
-                      handleRemovePreset('packagingFeePresets', index)
-                    }
-                  />
+                <div className="flex gap-4 pt-4">
+                  <Button className="flex-1" type="submit">
+                    {t('calculator.actions.calculateTotal')}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={resetForm}>
+                    {t('calculator.actions.reset')}
+                  </Button>
+                  <DrawerClose asChild>
+                    <Button type="button" variant="secondary">
+                      {t('calculator.actions.close', { defaultValue: 'Close' })}
+                    </Button>
+                  </DrawerClose>
                 </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Button className="flex-1" type="submit">
-                  {t('calculator.actions.calculateTotal')}
-                </Button>
-                <Button type="button" variant="outline" onClick={resetForm}>
-                  {t('calculator.actions.reset')}
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Column - Results */}
-            <div className="space-y-6">
-              <ResultDisplay
-                discountedPrice={watchedValues.discountedPrice}
-                exchangeRate={exchangeRate}
-                fees={fees}
-                finalTotal={finalTotal}
-                hasDiscount={watchedValues.hasDiscount}
-                originalPrice={watchedValues.originalPrice}
-                sourceCurrency={watchedValues.sourceCurrency}
-                subtotal={subtotal}
-                targetCurrency={watchedValues.targetCurrency}
-              />
-            </div>
+              </form>
+            </Form>
           </div>
-        </form>
-      </Form>
-    </div>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }

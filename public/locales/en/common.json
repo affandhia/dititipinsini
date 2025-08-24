@@ -4,7 +4,8 @@
     "description": "Professional personal shopper cost calculator with multi-currency support",
     "sections": {
       "itemCurrency": "Item & Currency",
-      "feesCharges": "Fees & Charges"
+      "feesCharges": "Fees & Charges",
+      "config": "Configuration"
     },
     "fields": {
       "originalPrice": "Original Price",

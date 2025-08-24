@@ -40,21 +40,10 @@ const defaultFormValues: CalculatorFormValues = validatedConfig;
 
 const FORM_VALUES_KEY = 'calculator-form-state';
 const DRAWER_SNAP_POINTS = [0.5, 0.8, 1]; // 50%, 70%, and 100% of screen height
-const DRAWER_FADE_FROM_INDEX = 2; // Start fading overlay from the second snap point (50%)
 
 export function CalculatorCard() {
   const { t } = useTranslation('common');
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-
-  // Snap points configuration for Google Maps-like behavior
-  const [activeSnapPoint, setActiveSnapPoint] = useState(DRAWER_SNAP_POINTS[0]); // Start at 50%
-
-  // Handle snap point changes with proper typing
-  const handleSnapPointChange = (snapPoint: string | number | null) => {
-    if (typeof snapPoint === 'number') {
-      setActiveSnapPoint(snapPoint);
-    }
-  };
 
   // State persistence with useLocalStorage
   const [formValues, setFormValues] = useLocalStorage<CalculatorFormValues>(
@@ -344,30 +333,17 @@ export function CalculatorCard() {
 
         {/* Snap point indicators */}
         <div className="mb-80 flex justify-center space-x-2">
-          {DRAWER_SNAP_POINTS.map((point) => (
-            <button
-              key={point}
-              className={`h-3 w-3 rounded-full transition-colors ${
-                activeSnapPoint === point
-                  ? 'bg-primary'
-                  : 'bg-muted-foreground/30'
-              }`}
-              onClick={() => {
-                setIsDrawerOpen(true);
-                handleSnapPointChange(point);
-              }}
-            />
-          ))}
+          {/* implement button to set drawer open true */}
+          <Button className="bg-primary" onClick={() => setIsDrawerOpen(true)}>
+            {t('calculator.sections.config', { defaultValue: 'Configuration' })}
+          </Button>
         </div>
       </div>
 
       {/* Bottom Drawer with Form */}
       <Drawer
-        activeSnapPoint={activeSnapPoint}
-        fadeFromIndex={DRAWER_FADE_FROM_INDEX}
         modal={false}
         open={isDrawerOpen}
-        setActiveSnapPoint={handleSnapPointChange}
         snapPoints={DRAWER_SNAP_POINTS}
         onOpenChange={setIsDrawerOpen}
       >

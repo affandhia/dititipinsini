@@ -4,7 +4,8 @@
     "description": "Kalkulator jastip pro, bisa pakai banyak mata uang",
     "sections": {
       "itemCurrency": "Barang & Mata Uang",
-      "feesCharges": "Biaya & Ongkos"
+      "feesCharges": "Biaya & Ongkos",
+      "config": "Konfigurasi"
     },
     "fields": {
       "originalPrice": "Harga Asli",

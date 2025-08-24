@@ -11,6 +11,8 @@ interface FeeCalculation {
 
 interface ResultDisplayProps {
   originalPrice: number;
+  hasDiscount: boolean;
+  discountedPrice: number;
   sourceCurrency: string;
   targetCurrency: string;
   exchangeRate: number;
@@ -21,6 +23,8 @@ interface ResultDisplayProps {
 
 export function ResultDisplay({
   originalPrice,
+  hasDiscount,
+  discountedPrice,
   sourceCurrency,
   targetCurrency,
   exchangeRate,
@@ -45,6 +49,16 @@ export function ResultDisplay({
           </span>
         </div>
 
+        {/* Discounted Price - show only if discount is applied */}
+        {hasDiscount && discountedPrice > 0 && (
+          <div className="flex justify-between">
+            <span>{t('calculator.results.discountedPrice')}</span>
+            <span className="font-medium text-green-600">
+              {formatCurrency(discountedPrice, sourceCurrency)}
+            </span>
+          </div>
+        )}
+
         {/* Exchange Rate */}
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
@@ -60,7 +74,12 @@ export function ResultDisplay({
         <div className="flex justify-between">
           <span>{t('calculator.results.convertedBasePrice')}</span>
           <span className="font-medium">
-            {formatCurrency(originalPrice * exchangeRate, targetCurrency)}
+            {formatCurrency(
+              (hasDiscount && discountedPrice > 0
+                ? discountedPrice
+                : originalPrice) * exchangeRate,
+              targetCurrency
+            )}
           </span>
         </div>
 

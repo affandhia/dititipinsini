@@ -8,7 +8,15 @@ import { type z } from 'zod';
 
 import { validatedConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
-import { Form } from '@/libs/frontend/components/core/form';
+import { Checkbox } from '@/libs/frontend/components/core/checkbox';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+} from '@/libs/frontend/components/core/form';
+import { Input } from '@/libs/frontend/components/core/input';
 import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
 import { useTranslation } from '@/libs/i18n/client';
 import { calculatorSchema } from '@/schemas/calculatorSchema';
@@ -41,13 +49,45 @@ export function CalculatorCard() {
     mode: 'all',
   });
 
-  const { watch, control, handleSubmit } = form;
+  const { watch, control, handleSubmit, setValue } = form;
 
   // Get current form values without watching for changes
   const watchedValues = watch();
   useEffect(() => {
     localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(watchedValues));
   }, [watchedValues]);
+
+  // Handle discount calculations - bidirectional updates
+  const { originalPrice, hasDiscount } = watchedValues;
+
+  // Reset discount fields when discount is disabled
+  useEffect(() => {
+    if (!hasDiscount) {
+      setValue('discountPercentage', 0);
+      setValue('discountedPrice', 0);
+    }
+  }, [hasDiscount, setValue]);
+
+  // Handle discount percentage change
+  const handleDiscountPercentageChange = (percentage: number) => {
+    setValue('discountPercentage', percentage);
+    if (originalPrice > 0 && percentage >= 0 && percentage <= 100) {
+      const newDiscountedPrice = originalPrice * (1 - percentage / 100);
+      setValue('discountedPrice', newDiscountedPrice);
+    }
+  };
+
+  // Handle discounted price change
+  const handleDiscountedPriceChange = (price: number) => {
+    setValue('discountedPrice', price);
+    if (originalPrice > 0 && price >= 0) {
+      const newDiscountPercentage =
+        ((originalPrice - price) / originalPrice) * 100;
+      if (newDiscountPercentage >= 0 && newDiscountPercentage <= 100) {
+        setValue('discountPercentage', newDiscountPercentage);
+      }
+    }
+  };
 
   // Currency API for exchange rates
   const {
@@ -153,8 +193,15 @@ export function CalculatorCard() {
 
   // Calculation logic
   const calculateTotal = () => {
-    const { originalPrice, netFee, baggageFee, deliveryFee, packagingFee } =
-      watchedValues;
+    const {
+      originalPrice,
+      hasDiscount,
+      discountedPrice,
+      netFee,
+      baggageFee,
+      deliveryFee,
+      packagingFee,
+    } = watchedValues;
 
     if (!originalPrice || originalPrice <= 0) {
       return {
@@ -164,7 +211,10 @@ export function CalculatorCard() {
       };
     }
 
-    const convertedBasePrice = originalPrice * exchangeRate;
+    // Use discounted price if discount is applied, otherwise use original price
+    const basePrice =
+      hasDiscount && discountedPrice > 0 ? discountedPrice : originalPrice;
+    const convertedBasePrice = basePrice * exchangeRate;
 
     // Calculate each fee
     const netFeeAmount =
@@ -278,6 +328,85 @@ export function CalculatorCard() {
                     }
                   />
 
+                  {/* Discount Section */}
+                  <FormField
+                    control={control}
+                    name="hasDiscount"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-y-0 space-x-3">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          {t('calculator.fields.hasDiscount')}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+
+                  {hasDiscount && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={control}
+                        name="discountPercentage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t('calculator.fields.discountPercentage')}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                max="100"
+                                min="0"
+                                placeholder={t(
+                                  'calculator.forms.placeholders.discountPercentage'
+                                )}
+                                step="0.1"
+                                type="number"
+                                onChange={(e) =>
+                                  handleDiscountPercentageChange(
+                                    Number(e.target.value)
+                                  )
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={control}
+                        name="discountedPrice"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t('calculator.fields.discountedPrice')}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                min="0"
+                                placeholder={t(
+                                  'calculator.forms.placeholders.discountedPrice'
+                                )}
+                                step="0.01"
+                                type="number"
+                                onChange={(e) =>
+                                  handleDiscountedPriceChange(
+                                    Number(e.target.value)
+                                  )
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
                   <CurrencySelector
                     control={control}
                     label={t('calculator.fields.sourceCurrency')}
@@ -383,9 +512,11 @@ export function CalculatorCard() {
             {/* Right Column - Results */}
             <div className="space-y-6">
               <ResultDisplay
+                discountedPrice={watchedValues.discountedPrice}
                 exchangeRate={exchangeRate}
                 fees={fees}
                 finalTotal={finalTotal}
+                hasDiscount={watchedValues.hasDiscount}
                 originalPrice={watchedValues.originalPrice}
                 sourceCurrency={watchedValues.sourceCurrency}
                 subtotal={subtotal}

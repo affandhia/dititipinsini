@@ -1,5 +1,8 @@
 {
   "originalPrice": 10,
+  "hasDiscount": false,
+  "discountPercentage": 0,
+  "discountedPrice": 0,
   "sourceCurrency": "SGD",
   "targetCurrency": "IDR",
   "exchangeRate": 1,

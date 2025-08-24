@@ -8,6 +8,9 @@
     },
     "fields": {
       "originalPrice": "Original Price",
+      "hasDiscount": "Apply Discount",
+      "discountPercentage": "Discount Percentage",
+      "discountedPrice": "Discounted Price",
       "sourceCurrency": "Source Currency",
       "targetCurrency": "Target Currency",
       "exchangeRate": "Exchange Rate",
@@ -26,6 +29,7 @@
     "results": {
       "costBreakdown": "Cost Breakdown",
       "originalPrice": "Original Price:",
+      "discountedPrice": "Discounted Price:",
       "exchangeRate": "Exchange Rate ({{sourceCurrency}} → {{targetCurrency}}):",
       "convertedBasePrice": "Converted Base Price:",
       "subtotal": "Subtotal:",
@@ -40,6 +44,8 @@
       "placeholders": {
         "exchangeRate": "0.0000",
         "enterAmount": "Enter amount",
+        "discountPercentage": "Enter discount %",
+        "discountedPrice": "Enter discounted price",
         "selectCurrency": "Select {{label}}",
         "searchCurrencies": "Search currencies..."
       },

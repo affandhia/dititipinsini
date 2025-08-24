@@ -7,6 +7,16 @@ const feeSchema = z.object({
 
 export const calculatorSchema = z.object({
   originalPrice: z.coerce.number().positive('Price must be positive.'),
+  hasDiscount: z.boolean().default(false),
+  discountPercentage: z.coerce
+    .number()
+    .min(0, 'Discount percentage cannot be negative.')
+    .max(100, 'Discount percentage cannot exceed 100%.')
+    .default(0),
+  discountedPrice: z.coerce
+    .number()
+    .min(0, 'Discounted price cannot be negative.')
+    .default(0),
   sourceCurrency: z.string().min(3, 'Please select a currency.'),
   targetCurrency: z.string().min(3, 'Please select a currency.'),
   exchangeRate: z.coerce.number().positive('Exchange rate must be positive.'),

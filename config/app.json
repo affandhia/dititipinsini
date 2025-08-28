@@ -5,20 +5,20 @@
   "discountedPrice": 0,
   "sourceCurrency": "SGD",
   "targetCurrency": "IDR",
-  "exchangeRate": 1,
-  "sourceCurrencyList": ["USD", "EUR", "GBP", "JPY", "SGD"],
-  "targetCurrencyList": ["IDR", "MYR", "THB", "PHP", "USD"],
+  "exchangeRate": 12716,
+  "sourceCurrencyList": ["USD", "MYR", "SGD", "IDR"],
+  "targetCurrencyList": ["IDR", "SGD"],
   "netFee": { "type": "percentage", "value": 10 },
-  "baggageFee": { "type": "fixed", "value": 50000 },
+  "baggageFee": { "type": "fixed", "value": 25000 },
   "deliveryFee": { "type": "fixed", "value": 20000 },
-  "packagingFee": { "type": "fixed", "value": 5000 },
+  "packagingFee": { "type": "fixed", "value": 10000 },
   "originalPricePresets": [],
   "netFeePresets": [
-    { "type": "percentage", "value": 5 },
     { "type": "percentage", "value": 10 },
     { "type": "percentage", "value": 15 },
     { "type": "percentage", "value": 20 },
-    { "type": "percentage", "value": 30 }
+    { "type": "percentage", "value": 30 },
+    { "type": "fixed", "value": 50000 }
   ],
   "baggageFeePresets": [
     { "type": "fixed", "value": 25000 },
@@ -33,7 +33,7 @@
     { "type": "fixed", "value": 50000 }
   ],
   "packagingFeePresets": [
-    { "type": "fixed", "value": 5000 },
+    { "type": "fixed", "value": 1200, "description": "Uniqlo Bag" },
     { "type": "fixed", "value": 10000 },
     { "type": "fixed", "value": 15000 },
     { "type": "fixed", "value": 20000 }

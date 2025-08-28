@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { QueryClientWrapper } from '@/libs/frontend/components/QueryClientWrapper';
-import { I18nProvider } from '@/libs/i18n/I18nProvider';
+// ...existing code...
 
 import type { Metadata, Viewport } from 'next';
 
@@ -62,9 +62,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryClientWrapper>
-          <I18nProvider>{children}</I18nProvider>
-        </QueryClientWrapper>
+        <QueryClientWrapper>{children}</QueryClientWrapper>
       </body>
     </html>
   );

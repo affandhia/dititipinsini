@@ -2,12 +2,14 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronsUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'react-use';
-import { type z } from 'zod';
 
-import { validatedCalculatorConfig } from '@/config/validate';
+import {
+  validatedCalculatorConfig,
+  validatedUserConfig,
+} from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
 import { Checkbox } from '@/libs/frontend/components/core/checkbox';
 import {
@@ -33,7 +35,12 @@ import {
 import { Input } from '@/libs/frontend/components/core/input';
 import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
 import { useTranslation } from '@/libs/i18n/client';
-import { calculatorSchema } from '@/schemas/calculatorSchema';
+import {
+  CalculatorFormValues,
+  calculatorSchema,
+  UserConfigFormValues,
+  userConfigSchema,
+} from '@/schemas/calculatorSchema';
 
 import {
   InputBase,
@@ -49,20 +56,19 @@ import { FeeInput } from './FeeInput';
 import { NumericInputWithPresets } from './NumericInputWithPresets';
 import { ResultDisplay } from './ResultDisplay';
 
-type CalculatorFormValues = z.infer<typeof calculatorSchema>;
-
 // Default state with comprehensive initial values
 const defaultCalculatorValues: CalculatorFormValues = validatedCalculatorConfig;
+const defaultUserConfigValues: UserConfigFormValues = validatedUserConfig;
 
 const CALCULATOR_FORM_VALUES_KEY = 'calculator-form-state';
+const USER_CONFIG_FORM_VALUES_KEY = 'user-config-form-state';
 const DRAWER_SNAP_POINTS = [0.32, 0.8, 1]; // 50%, 70%, and 100% of screen height
 
 export function CalculatorCard() {
   const { t } = useTranslation('common');
-  const [resultView, setResultView] = useState<'drawer' | 'inline'>('drawer');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   // State persistence with useLocalStorage
+
   const [storedCalculatorValues, storeCalculatorValues] =
     useLocalStorage<CalculatorFormValues>(
       CALCULATOR_FORM_VALUES_KEY,
@@ -77,16 +83,16 @@ export function CalculatorCard() {
   });
 
   // Get current form values without watching for changes
-  const watchedValues = calculatorForm.watch();
+  const watchedCalculatorValues = calculatorForm.watch();
   useEffect(() => {
     localStorage.setItem(
       CALCULATOR_FORM_VALUES_KEY,
-      JSON.stringify(watchedValues)
+      JSON.stringify(watchedCalculatorValues)
     );
-  }, [watchedValues]);
+  }, [watchedCalculatorValues]);
 
   // Handle discount calculations - bidirectional updates
-  const { originalPrice, hasDiscount } = watchedValues;
+  const { originalPrice, hasDiscount } = watchedCalculatorValues;
 
   // Reset discount fields when discount is disabled
   useEffect(() => {
@@ -94,7 +100,7 @@ export function CalculatorCard() {
       calculatorForm.setValue('discountPercentage', 0);
       calculatorForm.setValue('discountedPrice', 0);
     }
-  }, [hasDiscount, calculatorForm.setValue]);
+  }, [hasDiscount, calculatorForm]);
 
   // Handle discount percentage change
   const handleDiscountPercentageChange = (percentage: number) => {
@@ -120,25 +126,25 @@ export function CalculatorCard() {
     data: exchangeRateData,
     isLoading: isLoadingRates,
     refetch: refetchExchangeRate,
-  } = useCurrencyApi(watchedValues.sourceCurrency);
+  } = useCurrencyApi(watchedCalculatorValues.sourceCurrency);
 
   // Auto-update exchange rate when API data changes
   useEffect(() => {
     if (
       exchangeRateData &&
-      watchedValues.sourceCurrency &&
-      watchedValues.targetCurrency
+      watchedCalculatorValues.sourceCurrency &&
+      watchedCalculatorValues.targetCurrency
     ) {
       const apiRate =
-        exchangeRateData[watchedValues.sourceCurrency.toLowerCase()]?.[
-          watchedValues.targetCurrency.toLowerCase()
-        ];
+        exchangeRateData[
+          watchedCalculatorValues.sourceCurrency.toLowerCase()
+        ]?.[watchedCalculatorValues.targetCurrency.toLowerCase()];
       calculatorForm.setValue('exchangeRate', apiRate);
     }
   }, [
     exchangeRateData,
-    watchedValues.sourceCurrency,
-    watchedValues.targetCurrency,
+    watchedCalculatorValues.sourceCurrency,
+    watchedCalculatorValues.targetCurrency,
     calculatorForm,
   ]);
 
@@ -147,8 +153,8 @@ export function CalculatorCard() {
     const result = await refetchExchangeRate();
     if (result.data) {
       const apiRate =
-        result.data[watchedValues.sourceCurrency.toLowerCase()]?.[
-          watchedValues.targetCurrency.toLowerCase()
+        result.data[watchedCalculatorValues.sourceCurrency.toLowerCase()]?.[
+          watchedCalculatorValues.targetCurrency.toLowerCase()
         ];
       if (apiRate) {
         calculatorForm.setValue('exchangeRate', apiRate);
@@ -158,9 +164,9 @@ export function CalculatorCard() {
 
   // Use form exchange rate, fallback to API rate if form rate is not set
   const exchangeRate =
-    watchedValues.exchangeRate ||
-    exchangeRateData?.[watchedValues.sourceCurrency.toLowerCase()]?.[
-      watchedValues.targetCurrency.toLowerCase()
+    watchedCalculatorValues.exchangeRate ||
+    exchangeRateData?.[watchedCalculatorValues.sourceCurrency.toLowerCase()]?.[
+      watchedCalculatorValues.targetCurrency.toLowerCase()
     ] ||
     1;
 
@@ -230,7 +236,7 @@ export function CalculatorCard() {
       baggageFee,
       deliveryFee,
       packagingFee,
-    } = watchedValues;
+    } = watchedCalculatorValues;
 
     if (!originalPrice || originalPrice <= 0) {
       return {
@@ -326,8 +332,41 @@ export function CalculatorCard() {
     storeCalculatorValues(defaultCalculatorValues);
   };
 
-  const isDrawerView = resultView === 'drawer';
-  const isInlineView = resultView === 'inline';
+  // =========================
+  // ===== USER CONFIG =======
+  // =========================
+
+  const [storedUserConfigValues] = useLocalStorage<UserConfigFormValues>(
+    USER_CONFIG_FORM_VALUES_KEY,
+    defaultUserConfigValues
+  );
+
+  const userConfigForm = useForm<UserConfigFormValues>({
+    resolver: zodResolver(userConfigSchema) as Resolver<UserConfigFormValues>,
+    defaultValues: storedUserConfigValues,
+    mode: 'all',
+  });
+
+  const watchedUserConfigValues = userConfigForm.watch();
+  useEffect(() => {
+    localStorage.setItem(
+      USER_CONFIG_FORM_VALUES_KEY,
+      JSON.stringify(watchedUserConfigValues)
+    );
+  }, [watchedUserConfigValues]);
+
+  // Result view and drawer open state are now managed in userConfigForm
+  // Ensure default values exist in userConfigForm
+  // If not present, fallback to 'drawer' and true
+  const watchedResultView = watchedUserConfigValues.resultView ?? 'drawer';
+  const watchedIsDrawerOpen =
+    typeof watchedUserConfigValues.isDrawerOpen === 'boolean'
+      ? watchedUserConfigValues.isDrawerOpen
+      : true;
+
+  const isDrawerView = watchedResultView === 'drawer';
+  const isInlineView = watchedResultView === 'inline';
+
   return (
     <>
       {/* Main Content - ResultDisplay */}
@@ -370,8 +409,12 @@ export function CalculatorCard() {
                           isLoading={isLoadingRates}
                           label={t('calculator.fields.exchangeRate')}
                           name="exchangeRate"
-                          sourceCurrency={watchedValues.sourceCurrency}
-                          targetCurrency={watchedValues.targetCurrency}
+                          sourceCurrency={
+                            watchedCalculatorValues.sourceCurrency
+                          }
+                          targetCurrency={
+                            watchedCalculatorValues.targetCurrency
+                          }
                           onRefresh={handleRefreshExchangeRate}
                         />
 
@@ -392,7 +435,7 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.originalPrice')}
                           name="originalPrice"
-                          presets={watchedValues.originalPricePresets}
+                          presets={watchedCalculatorValues.originalPricePresets}
                           onAddPreset={(value) =>
                             handleAddPreset('originalPricePresets', value)
                           }
@@ -406,7 +449,7 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           name="hasDiscount"
                           render={({ field }) => (
-                            <FormItem className="flex flex-row items-center space-y-0 space-x-3">
+                            <FormItem className="flex flex-row items-center">
                               <FormControl>
                                 <Checkbox
                                   checked={field.value}
@@ -505,7 +548,7 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.netFee')}
                           name="netFee"
-                          presets={watchedValues.netFeePresets}
+                          presets={watchedCalculatorValues.netFeePresets}
                           onAddPreset={(value) =>
                             handleAddPreset('netFeePresets', value)
                           }
@@ -518,7 +561,7 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.baggageFee')}
                           name="baggageFee"
-                          presets={watchedValues.baggageFeePresets}
+                          presets={watchedCalculatorValues.baggageFeePresets}
                           onAddPreset={(value) =>
                             handleAddPreset('baggageFeePresets', value)
                           }
@@ -531,7 +574,7 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.deliveryFee')}
                           name="deliveryFee"
-                          presets={watchedValues.deliveryFeePresets}
+                          presets={watchedCalculatorValues.deliveryFeePresets}
                           onAddPreset={(value) =>
                             handleAddPreset('deliveryFeePresets', value)
                           }
@@ -544,7 +587,7 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.packagingFee')}
                           name="packagingFee"
-                          presets={watchedValues.packagingFeePresets}
+                          presets={watchedCalculatorValues.packagingFeePresets}
                           onAddPreset={(value) =>
                             handleAddPreset('packagingFeePresets', value)
                           }
@@ -566,15 +609,20 @@ export function CalculatorCard() {
                   </Button>
                 </div>
 
-                <div className="flex flex-row justify-between">
-                  {t('calculator.results.costBreakdown')}
-                  <div className="flex items-center">
+                <div className="flex flex-row items-center justify-between">
+                  <h3 className="text-lg font-medium">
+                    {t('calculator.results.costBreakdown')}
+                  </h3>
+                  <div className="flex items-center gap-2">
                     <div className="flex items-center space-x-2">
                       <Switch
                         checked={isDrawerView}
                         id="drawer-mode"
                         onCheckedChange={(value) =>
-                          setResultView(value ? 'drawer' : 'inline')
+                          userConfigForm.setValue(
+                            'resultView',
+                            value ? 'drawer' : 'inline'
+                          )
                         }
                       />
                       <Label htmlFor="drawer-mode">
@@ -583,12 +631,14 @@ export function CalculatorCard() {
                         })}
                       </Label>
                     </div>
-                    {isDrawerView && !isDrawerOpen && (
+                    {isDrawerView && !watchedIsDrawerOpen && (
                       <div className="flex justify-center space-x-2">
-                        {/* implement button to set drawer open true */}
                         <Button
                           className="bg-primary"
-                          onClick={() => setIsDrawerOpen(true)}
+                          size="sm"
+                          onClick={() =>
+                            userConfigForm.setValue('isDrawerOpen', true)
+                          }
                         >
                           {t('calculator.show', { defaultValue: 'Show' })}
                         </Button>
@@ -599,15 +649,15 @@ export function CalculatorCard() {
 
                 {isInlineView && (
                   <ResultDisplay
-                    discountedPrice={watchedValues.discountedPrice}
+                    discountedPrice={watchedCalculatorValues.discountedPrice}
                     exchangeRate={exchangeRate}
                     fees={fees}
                     finalTotal={finalTotal}
-                    hasDiscount={watchedValues.hasDiscount}
-                    originalPrice={watchedValues.originalPrice}
-                    sourceCurrency={watchedValues.sourceCurrency}
+                    hasDiscount={watchedCalculatorValues.hasDiscount}
+                    originalPrice={watchedCalculatorValues.originalPrice}
+                    sourceCurrency={watchedCalculatorValues.sourceCurrency}
                     subtotal={subtotal}
-                    targetCurrency={watchedValues.targetCurrency}
+                    targetCurrency={watchedCalculatorValues.targetCurrency}
                   />
                 )}
               </form>
@@ -619,9 +669,9 @@ export function CalculatorCard() {
       {/* Bottom Drawer with Form */}
       <Drawer
         modal={false}
-        open={isDrawerView && isDrawerOpen}
+        open={isDrawerView && watchedIsDrawerOpen}
         snapPoints={DRAWER_SNAP_POINTS}
-        onOpenChange={setIsDrawerOpen}
+        onOpenChange={(open) => userConfigForm.setValue('isDrawerOpen', open)}
       >
         <DrawerContent>
           <DrawerHeader>
@@ -632,15 +682,15 @@ export function CalculatorCard() {
             <>
               <ResultDisplay
                 className="mx-6 overflow-y-auto"
-                discountedPrice={watchedValues.discountedPrice}
+                discountedPrice={watchedCalculatorValues.discountedPrice}
                 exchangeRate={exchangeRate}
                 fees={fees}
                 finalTotal={finalTotal}
-                hasDiscount={watchedValues.hasDiscount}
-                originalPrice={watchedValues.originalPrice}
-                sourceCurrency={watchedValues.sourceCurrency}
+                hasDiscount={watchedCalculatorValues.hasDiscount}
+                originalPrice={watchedCalculatorValues.originalPrice}
+                sourceCurrency={watchedCalculatorValues.sourceCurrency}
                 subtotal={subtotal}
-                targetCurrency={watchedValues.targetCurrency}
+                targetCurrency={watchedCalculatorValues.targetCurrency}
               />
 
               <DrawerFooter className="px-6 pt-6">

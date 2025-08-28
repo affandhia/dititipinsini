@@ -7,6 +7,7 @@ const feeSchema = z.object({
 
 export const userConfigSchema = z.object({
   resultView: z.enum(['drawer', 'inline']).default('drawer'),
+  isDrawerOpen: z.boolean().default(true),
   shouldShowPresets: z.boolean().default(true),
 });
 

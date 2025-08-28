@@ -1,8 +1,8 @@
 {
-  "id": "next_pwa",
-  "name": "Next.js Typescript PWA",
-  "short_name": "NextJS TS PWA",
-  "description": "Starter kit",
+  "id": "dititip_in_sini",
+  "name": "Dititip In Sini - Jastip Calculator",
+  "short_name": "Dititip In Sini",
+  "description": "Professional personal shopping (jastip) cost calculator with multi-currency support, exchange rates, and comprehensive fee tracking for cross-border purchases.",
   "icons": [
     {
       "src": "./logo72x72.png",

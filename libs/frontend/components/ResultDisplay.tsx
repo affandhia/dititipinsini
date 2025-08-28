@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronsUpDown } from 'lucide-react';
+import nstr from 'nstr';
 
 import {
   Collapsible,
@@ -79,7 +80,7 @@ export function ResultDisplay({
               targetCurrency,
             })}
           </span>
-          <span>{exchangeRate.toFixed(4)}</span>
+          <span>{nstr(exchangeRate)}</span>
         </div>
 
         {/* Converted Base Price */}
@@ -87,9 +88,13 @@ export function ResultDisplay({
           <span>{t('calculator.results.convertedBasePrice')}</span>
           <span className="font-medium">
             {formatCurrency(
-              (hasDiscount && discountedPrice > 0
-                ? discountedPrice
-                : originalPrice) * exchangeRate,
+              Number(
+                nstr(
+                  (hasDiscount && discountedPrice > 0
+                    ? discountedPrice
+                    : originalPrice) * exchangeRate
+                )
+              ),
               targetCurrency
             )}
           </span>
@@ -104,7 +109,7 @@ export function ResultDisplay({
               <span className="font-semibold">
                 {t('calculator.results.fees', { defaultValue: 'Total Fee:' })}{' '}
                 {formatCurrency(
-                  fees.reduce((acc, fee) => acc + fee.amount, 0),
+                  Number(nstr(fees.reduce((acc, fee) => acc + fee.amount, 0))),
                   targetCurrency
                 )}
               </span>

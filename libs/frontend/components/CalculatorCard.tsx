@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronsUpDown } from 'lucide-react';
+import nstr from 'nstr';
 import { useEffect } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'react-use';
@@ -106,7 +107,10 @@ export function CalculatorCard() {
   const handleDiscountPercentageChange = (percentage: number) => {
     if (originalPrice > 0 && percentage >= 0 && percentage <= 100) {
       const newDiscountedPrice = originalPrice * (1 - percentage / 100);
-      calculatorForm.setValue('discountedPrice', newDiscountedPrice);
+      calculatorForm.setValue(
+        'discountedPrice',
+        Number(nstr(newDiscountedPrice))
+      );
     }
   };
 
@@ -116,7 +120,10 @@ export function CalculatorCard() {
       const newDiscountPercentage =
         ((originalPrice - price) / originalPrice) * 100;
       if (newDiscountPercentage >= 0 && newDiscountPercentage <= 100) {
-        calculatorForm.setValue('discountPercentage', newDiscountPercentage);
+        calculatorForm.setValue(
+          'discountPercentage',
+          Number(nstr(newDiscountPercentage))
+        );
       }
     }
   };
@@ -139,7 +146,7 @@ export function CalculatorCard() {
         exchangeRateData[
           watchedCalculatorValues.sourceCurrency.toLowerCase()
         ]?.[watchedCalculatorValues.targetCurrency.toLowerCase()];
-      calculatorForm.setValue('exchangeRate', apiRate);
+      calculatorForm.setValue('exchangeRate', Number(nstr(apiRate)));
     }
   }, [
     exchangeRateData,
@@ -157,7 +164,7 @@ export function CalculatorCard() {
           watchedCalculatorValues.targetCurrency.toLowerCase()
         ];
       if (apiRate) {
-        calculatorForm.setValue('exchangeRate', apiRate);
+        calculatorForm.setValue('exchangeRate', Number(nstr(apiRate)));
       }
     }
   };
@@ -249,28 +256,40 @@ export function CalculatorCard() {
     // Use discounted price if discount is applied, otherwise use original price
     const basePrice =
       hasDiscount && discountedPrice > 0 ? discountedPrice : originalPrice;
-    const convertedBasePrice = basePrice * exchangeRate;
+    const convertedBasePrice = Number(nstr(basePrice * exchangeRate));
 
     // Calculate each fee
-    const netFeeAmount =
-      netFee.type === 'percentage'
-        ? (convertedBasePrice * netFee.value) / 100
-        : netFee.value;
+    const netFeeAmount = Number(
+      nstr(
+        netFee.type === 'percentage'
+          ? (convertedBasePrice * netFee.value) / 100
+          : netFee.value
+      )
+    );
 
-    const baggageFeeAmount =
-      baggageFee.type === 'percentage'
-        ? (convertedBasePrice * baggageFee.value) / 100
-        : baggageFee.value;
+    const baggageFeeAmount = Number(
+      nstr(
+        baggageFee.type === 'percentage'
+          ? (convertedBasePrice * baggageFee.value) / 100
+          : baggageFee.value
+      )
+    );
 
-    const deliveryFeeAmount =
-      deliveryFee.type === 'percentage'
-        ? (convertedBasePrice * deliveryFee.value) / 100
-        : deliveryFee.value;
+    const deliveryFeeAmount = Number(
+      nstr(
+        deliveryFee.type === 'percentage'
+          ? (convertedBasePrice * deliveryFee.value) / 100
+          : deliveryFee.value
+      )
+    );
 
-    const packagingFeeAmount =
-      packagingFee.type === 'percentage'
-        ? (convertedBasePrice * packagingFee.value) / 100
-        : packagingFee.value;
+    const packagingFeeAmount = Number(
+      nstr(
+        packagingFee.type === 'percentage'
+          ? (convertedBasePrice * packagingFee.value) / 100
+          : packagingFee.value
+      )
+    );
 
     const fees = [
       {
@@ -278,7 +297,7 @@ export function CalculatorCard() {
         amount: netFeeAmount,
         displayValue:
           netFee.type === 'percentage'
-            ? `${netFee.value}%`
+            ? `${nstr(netFee.value)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
       {
@@ -286,7 +305,7 @@ export function CalculatorCard() {
         amount: baggageFeeAmount,
         displayValue:
           baggageFee.type === 'percentage'
-            ? `${baggageFee.value}%`
+            ? `${nstr(baggageFee.value)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
       {
@@ -294,7 +313,7 @@ export function CalculatorCard() {
         amount: deliveryFeeAmount,
         displayValue:
           deliveryFee.type === 'percentage'
-            ? `${deliveryFee.value}%`
+            ? `${nstr(deliveryFee.value)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
       {
@@ -302,15 +321,18 @@ export function CalculatorCard() {
         amount: packagingFeeAmount,
         displayValue:
           packagingFee.type === 'percentage'
-            ? `${packagingFee.value}%`
+            ? `${nstr(packagingFee.value)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
     ];
 
-    const totalFees =
-      netFeeAmount + baggageFeeAmount + deliveryFeeAmount + packagingFeeAmount;
-    const subtotal = convertedBasePrice + totalFees;
-    const finalTotal = subtotal;
+    const totalFees = Number(
+      nstr(
+        netFeeAmount + baggageFeeAmount + deliveryFeeAmount + packagingFeeAmount
+      )
+    );
+    const subtotal = Number(nstr(convertedBasePrice + totalFees));
+    const finalTotal = Number(nstr(subtotal));
 
     return {
       subtotal,

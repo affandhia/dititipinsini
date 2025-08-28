@@ -37,7 +37,7 @@
       "finalTotal": "Total Akhir:"
     },
     "feeTypes": {
-      "fixed": "Tetap",
+      "fixed": "Fixed",
       "percentage": "Persentase",
       "fixedAmount": "Nominal Tetap"
     },

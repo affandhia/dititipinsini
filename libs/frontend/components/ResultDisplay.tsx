@@ -3,6 +3,8 @@
 import { formatCurrency } from '@/libs/frontend/utils/currency';
 import { useTranslation } from '@/libs/i18n/client';
 
+import { cn } from '../utils';
+
 interface FeeCalculation {
   label: string;
   amount: number;
@@ -19,6 +21,7 @@ interface ResultDisplayProps {
   fees: FeeCalculation[];
   subtotal: number;
   finalTotal: number;
+  className?: HTMLDivElement['className'];
 }
 
 export function ResultDisplay({
@@ -31,15 +34,17 @@ export function ResultDisplay({
   fees,
   subtotal,
   finalTotal,
+  className,
 }: ResultDisplayProps) {
   const { t } = useTranslation('common');
 
   return (
-    <div className="rounded-lg border bg-card p-6 text-card-foreground">
-      <h3 className="mb-4 text-lg font-semibold">
-        {t('calculator.results.costBreakdown')}
-      </h3>
-
+    <div
+      className={cn(
+        className,
+        'rounded-lg border bg-card p-6 text-card-foreground'
+      )}
+    >
       <div className="space-y-3">
         {/* Original Price */}
         <div className="flex justify-between">

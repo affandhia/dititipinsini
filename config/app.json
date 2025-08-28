@@ -12,12 +12,13 @@
   "baggageFee": { "type": "fixed", "value": 50000 },
   "deliveryFee": { "type": "fixed", "value": 20000 },
   "packagingFee": { "type": "fixed", "value": 5000 },
-  "originalPricePresets": [10, 100, 200, 500, 1000],
+  "originalPricePresets": [],
   "netFeePresets": [
     { "type": "percentage", "value": 5 },
     { "type": "percentage", "value": 10 },
     { "type": "percentage", "value": 15 },
-    { "type": "percentage", "value": 20 }
+    { "type": "percentage", "value": 20 },
+    { "type": "percentage", "value": 30 }
   ],
   "baggageFeePresets": [
     { "type": "fixed", "value": 25000 },

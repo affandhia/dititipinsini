@@ -14,6 +14,8 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerClose,
+  DrawerTitle,
+  DrawerFooter,
 } from '@/libs/frontend/components/core/drawer';
 import {
   Form,
@@ -39,7 +41,7 @@ type CalculatorFormValues = z.infer<typeof calculatorSchema>;
 const defaultFormValues: CalculatorFormValues = validatedConfig;
 
 const FORM_VALUES_KEY = 'calculator-form-state';
-const DRAWER_SNAP_POINTS = [0.5, 0.8, 1]; // 50%, 70%, and 100% of screen height
+const DRAWER_SNAP_POINTS = [0.32, 0.8, 1]; // 50%, 70%, and 100% of screen height
 
 export function CalculatorCard() {
   const { t } = useTranslation('common');
@@ -253,7 +255,7 @@ export function CalculatorCard() {
         displayValue:
           netFee.type === 'percentage'
             ? `${netFee.value}%`
-            : `${t('calculator.feeTypes.fixed')} ${netFee.value}`,
+            : `${t('calculator.feeTypes.fixed')}`,
       },
       {
         label: t('calculator.fields.baggageFee'),
@@ -261,7 +263,7 @@ export function CalculatorCard() {
         displayValue:
           baggageFee.type === 'percentage'
             ? `${baggageFee.value}%`
-            : `${t('calculator.feeTypes.fixed')} ${baggageFee.value}`,
+            : `${t('calculator.feeTypes.fixed')}`,
       },
       {
         label: t('calculator.fields.deliveryFee'),
@@ -269,7 +271,7 @@ export function CalculatorCard() {
         displayValue:
           deliveryFee.type === 'percentage'
             ? `${deliveryFee.value}%`
-            : `${t('calculator.feeTypes.fixed')} ${deliveryFee.value}`,
+            : `${t('calculator.feeTypes.fixed')}`,
       },
       {
         label: t('calculator.fields.packagingFee'),
@@ -277,7 +279,7 @@ export function CalculatorCard() {
         displayValue:
           packagingFee.type === 'percentage'
             ? `${packagingFee.value}%`
-            : `${t('calculator.feeTypes.fixed')} ${packagingFee.value}`,
+            : `${t('calculator.feeTypes.fixed')}`,
       },
     ];
 
@@ -310,47 +312,8 @@ export function CalculatorCard() {
     <>
       {/* Main Content - ResultDisplay */}
       <div className="mx-auto max-w-4xl space-y-8 p-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">{t('calculator.title')}</h1>
-          <p className="text-muted-foreground">{t('calculator.description')}</p>
-        </div>
-
         <div className="flex justify-center">
           <div className="w-full max-w-2xl">
-            <ResultDisplay
-              discountedPrice={watchedValues.discountedPrice}
-              exchangeRate={exchangeRate}
-              fees={fees}
-              finalTotal={finalTotal}
-              hasDiscount={watchedValues.hasDiscount}
-              originalPrice={watchedValues.originalPrice}
-              sourceCurrency={watchedValues.sourceCurrency}
-              subtotal={subtotal}
-              targetCurrency={watchedValues.targetCurrency}
-            />
-          </div>
-        </div>
-
-        {/* Snap point indicators */}
-        <div className="mb-80 flex justify-center space-x-2">
-          {/* implement button to set drawer open true */}
-          <Button className="bg-primary" onClick={() => setIsDrawerOpen(true)}>
-            {t('calculator.sections.config', { defaultValue: 'Configuration' })}
-          </Button>
-        </div>
-      </div>
-
-      {/* Bottom Drawer with Form */}
-      <Drawer
-        modal={false}
-        open={isDrawerOpen}
-        snapPoints={DRAWER_SNAP_POINTS}
-        onOpenChange={setIsDrawerOpen}
-      >
-        <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader></DrawerHeader>
-
-          <div className="overflow-y-auto px-4 pb-4">
             <Form {...form}>
               <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid gap-6 md:grid-cols-2">
@@ -453,37 +416,42 @@ export function CalculatorCard() {
                             />
                           </div>
                         )}
-
-                        <CurrencySelector
-                          control={control}
-                          label={t('calculator.fields.sourceCurrency')}
-                          listName="sourceCurrencyList"
-                          name="sourceCurrency"
-                        />
-
-                        <CurrencySelector
-                          control={control}
-                          label={t('calculator.fields.targetCurrency')}
-                          listName="targetCurrencyList"
-                          name="targetCurrency"
-                        />
-
-                        <ExchangeRateInput
-                          control={control}
-                          isLoading={isLoadingRates}
-                          label={t('calculator.fields.exchangeRate')}
-                          name="exchangeRate"
-                          sourceCurrency={watchedValues.sourceCurrency}
-                          targetCurrency={watchedValues.targetCurrency}
-                          onRefresh={handleRefreshExchangeRate}
-                        />
-
-                        {isLoadingRates && (
-                          <div className="text-sm text-muted-foreground">
-                            {t('calculator.status.loadingExchangeRates')}
-                          </div>
-                        )}
                       </div>
+                    </div>
+                    <div className="rounded-lg border bg-card p-4 text-card-foreground">
+                      <h3 className="mb-4 text-lg font-semibold">
+                        {t('calculator.fields.exchangeRate')}
+                      </h3>
+
+                      <CurrencySelector
+                        control={control}
+                        label={t('calculator.fields.sourceCurrency')}
+                        listName="sourceCurrencyList"
+                        name="sourceCurrency"
+                      />
+
+                      <CurrencySelector
+                        control={control}
+                        label={t('calculator.fields.targetCurrency')}
+                        listName="targetCurrencyList"
+                        name="targetCurrency"
+                      />
+
+                      <ExchangeRateInput
+                        control={control}
+                        isLoading={isLoadingRates}
+                        label={t('calculator.fields.exchangeRate')}
+                        name="exchangeRate"
+                        sourceCurrency={watchedValues.sourceCurrency}
+                        targetCurrency={watchedValues.targetCurrency}
+                        onRefresh={handleRefreshExchangeRate}
+                      />
+
+                      {isLoadingRates && (
+                        <div className="text-sm text-muted-foreground">
+                          {t('calculator.status.loadingExchangeRates')}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -558,15 +526,53 @@ export function CalculatorCard() {
                   <Button type="button" variant="outline" onClick={resetForm}>
                     {t('calculator.actions.reset')}
                   </Button>
-                  <DrawerClose asChild>
-                    <Button type="button" variant="secondary">
-                      {t('calculator.actions.close', { defaultValue: 'Close' })}
-                    </Button>
-                  </DrawerClose>
                 </div>
               </form>
             </Form>
           </div>
+        </div>
+
+        {/* Snap point indicators */}
+        <div className="mb-80 flex justify-center space-x-2">
+          {/* implement button to set drawer open true */}
+          <Button className="bg-primary" onClick={() => setIsDrawerOpen(true)}>
+            {t('calculator.results.costBreakdown')}
+          </Button>
+        </div>
+      </div>
+
+      {/* Bottom Drawer with Form */}
+      <Drawer
+        modal={false}
+        open={isDrawerOpen}
+        snapPoints={DRAWER_SNAP_POINTS}
+        onOpenChange={setIsDrawerOpen}
+      >
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t('calculator.results.costBreakdown')}</DrawerTitle>
+          </DrawerHeader>
+
+          <ResultDisplay
+            className="mx-6 overflow-y-auto"
+            discountedPrice={watchedValues.discountedPrice}
+            exchangeRate={exchangeRate}
+            fees={fees}
+            finalTotal={finalTotal}
+            hasDiscount={watchedValues.hasDiscount}
+            originalPrice={watchedValues.originalPrice}
+            sourceCurrency={watchedValues.sourceCurrency}
+            subtotal={subtotal}
+            targetCurrency={watchedValues.targetCurrency}
+          />
+
+          <DrawerFooter className="px-6 pt-6">
+            <DrawerClose asChild>
+              <Button type="button" variant="secondary">
+                {t('calculator.actions.close', { defaultValue: 'Close' })}
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>

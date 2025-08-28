@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'react-use';
@@ -9,6 +10,11 @@ import { type z } from 'zod';
 import { validatedConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
 import { Checkbox } from '@/libs/frontend/components/core/checkbox';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '@/libs/frontend/components/core/collapsible';
 import {
   Drawer,
   DrawerContent,
@@ -29,6 +35,12 @@ import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
 import { useTranslation } from '@/libs/i18n/client';
 import { calculatorSchema } from '@/schemas/calculatorSchema';
 
+import {
+  InputBase,
+  InputBaseAdornment,
+  InputBaseControl,
+  InputBaseInput,
+} from './core/input-base';
 import { CurrencySelector } from './CurrencySelector';
 import { ExchangeRateInput } from './ExchangeRateInput';
 import { FeeInput } from './FeeInput';
@@ -311,7 +323,7 @@ export function CalculatorCard() {
   return (
     <>
       {/* Main Content - ResultDisplay */}
-      <div className="mx-auto max-w-4xl space-y-8 p-6">
+      <div className="mx-auto max-w-4xl space-y-8 p-6 pb-96">
         <div className="flex justify-center">
           <div className="w-full max-w-2xl">
             <Form {...form}>
@@ -319,6 +331,46 @@ export function CalculatorCard() {
                 <div className="grid gap-6 md:grid-cols-2">
                   {/* Left Column - Item & Currency */}
                   <div className="space-y-6">
+                    <Collapsible className="rounded-lg border bg-card p-4 text-card-foreground">
+                      <CollapsibleTrigger asChild>
+                        <h3 className="flex cursor-pointer flex-row items-center justify-between text-lg font-semibold select-none">
+                          {t('calculator.fields.exchangeRate')}
+                          <ChevronsUpDown size="14" />
+                          <span className="sr-only">{'Toggle'}</span>
+                        </h3>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-4 pt-4">
+                        <CurrencySelector
+                          control={control}
+                          label={t('calculator.fields.sourceCurrency')}
+                          listName="sourceCurrencyList"
+                          name="sourceCurrency"
+                        />
+
+                        <CurrencySelector
+                          control={control}
+                          label={t('calculator.fields.targetCurrency')}
+                          listName="targetCurrencyList"
+                          name="targetCurrency"
+                        />
+
+                        <ExchangeRateInput
+                          control={control}
+                          isLoading={isLoadingRates}
+                          label={t('calculator.fields.exchangeRate')}
+                          name="exchangeRate"
+                          sourceCurrency={watchedValues.sourceCurrency}
+                          targetCurrency={watchedValues.targetCurrency}
+                          onRefresh={handleRefreshExchangeRate}
+                        />
+
+                        {isLoadingRates && (
+                          <div className="text-sm text-muted-foreground">
+                            {t('calculator.status.loadingExchangeRates')}
+                          </div>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
                     <div className="rounded-lg border bg-card p-4 text-card-foreground">
                       <h3 className="mb-4 text-lg font-semibold">
                         {t('calculator.sections.itemCurrency')}
@@ -358,7 +410,7 @@ export function CalculatorCard() {
                         />
 
                         {hasDiscount && (
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-4">
                             <FormField
                               control={control}
                               name="discountPercentage"
@@ -368,21 +420,29 @@ export function CalculatorCard() {
                                     {t('calculator.fields.discountPercentage')}
                                   </FormLabel>
                                   <FormControl>
-                                    <Input
-                                      {...field}
-                                      max="100"
-                                      min="0"
-                                      placeholder={t(
-                                        'calculator.forms.placeholders.discountPercentage'
-                                      )}
-                                      step="0.1"
-                                      type="number"
-                                      onChange={(e) =>
-                                        handleDiscountPercentageChange(
-                                          Number(e.target.value)
-                                        )
-                                      }
-                                    />
+                                    <InputBase>
+                                      <InputBaseControl>
+                                        <InputBaseInput
+                                          {...field}
+                                          max="100"
+                                          min="0"
+                                          placeholder={t(
+                                            'calculator.forms.placeholders.discountPercentage'
+                                          )}
+                                          step="0.1"
+                                          type="number"
+                                          onChange={(e) =>
+                                            handleDiscountPercentageChange(
+                                              Number(e.target.value)
+                                            )
+                                          }
+                                        />
+                                      </InputBaseControl>
+
+                                      <InputBaseAdornment>
+                                        {'%'}
+                                      </InputBaseAdornment>
+                                    </InputBase>
                                   </FormControl>
                                 </FormItem>
                               )}
@@ -417,41 +477,6 @@ export function CalculatorCard() {
                           </div>
                         )}
                       </div>
-                    </div>
-                    <div className="rounded-lg border bg-card p-4 text-card-foreground">
-                      <h3 className="mb-4 text-lg font-semibold">
-                        {t('calculator.fields.exchangeRate')}
-                      </h3>
-
-                      <CurrencySelector
-                        control={control}
-                        label={t('calculator.fields.sourceCurrency')}
-                        listName="sourceCurrencyList"
-                        name="sourceCurrency"
-                      />
-
-                      <CurrencySelector
-                        control={control}
-                        label={t('calculator.fields.targetCurrency')}
-                        listName="targetCurrencyList"
-                        name="targetCurrency"
-                      />
-
-                      <ExchangeRateInput
-                        control={control}
-                        isLoading={isLoadingRates}
-                        label={t('calculator.fields.exchangeRate')}
-                        name="exchangeRate"
-                        sourceCurrency={watchedValues.sourceCurrency}
-                        targetCurrency={watchedValues.targetCurrency}
-                        onRefresh={handleRefreshExchangeRate}
-                      />
-
-                      {isLoadingRates && (
-                        <div className="text-sm text-muted-foreground">
-                          {t('calculator.status.loadingExchangeRates')}
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -533,12 +558,17 @@ export function CalculatorCard() {
         </div>
 
         {/* Snap point indicators */}
-        <div className="mb-80 flex justify-center space-x-2">
-          {/* implement button to set drawer open true */}
-          <Button className="bg-primary" onClick={() => setIsDrawerOpen(true)}>
-            {t('calculator.results.costBreakdown')}
-          </Button>
-        </div>
+        {!isDrawerOpen && (
+          <div className="mb-80 flex justify-center space-x-2">
+            {/* implement button to set drawer open true */}
+            <Button
+              className="bg-primary"
+              onClick={() => setIsDrawerOpen(true)}
+            >
+              {t('calculator.results.costBreakdown')}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Bottom Drawer with Form */}

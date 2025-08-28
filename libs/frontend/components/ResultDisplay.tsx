@@ -1,5 +1,12 @@
 'use client';
 
+import { ChevronsUpDown } from 'lucide-react';
+
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '@/libs/frontend/components/core/collapsible';
 import { formatCurrency } from '@/libs/frontend/utils/currency';
 import { useTranslation } from '@/libs/i18n/client';
 
@@ -90,18 +97,35 @@ export function ResultDisplay({
 
         <hr className="my-4" />
 
-        {/* Fees */}
-        {fees.map((fee) => (
-          <div key={fee.label} className="flex justify-between">
-            <span>{`${fee.label}:`}</span>
-            <span className="font-medium">
-              {formatCurrency(fee.amount, targetCurrency)}
-              <span className="ml-2 text-sm text-muted-foreground">
-                {`(${fee.displayValue})`}
+        {/* Fees (Collapsible) */}
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <div className="flex cursor-pointer items-center justify-between py-2 select-none">
+              <span className="font-semibold">
+                {t('calculator.results.fees', { defaultValue: 'Total Fee:' })}{' '}
+                {formatCurrency(
+                  fees.reduce((acc, fee) => acc + fee.amount, 0),
+                  targetCurrency
+                )}
               </span>
-            </span>
-          </div>
-        ))}
+              <ChevronsUpDown size="14" />
+              <span className="sr-only">{'Toggle'}</span>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-3">
+            {fees.map((fee) => (
+              <div key={fee.label} className="flex justify-between">
+                <span>{`${fee.label}:`}</span>
+                <span className="font-medium">
+                  {formatCurrency(fee.amount, targetCurrency)}
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {`(${fee.displayValue})`}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
 
         <hr className="my-4" />
 

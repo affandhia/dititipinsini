@@ -11,12 +11,10 @@ export const calculatorSchema = z.object({
   discountPercentage: z.coerce
     .number()
     .min(0, 'Discount percentage cannot be negative.')
-    .max(100, 'Discount percentage cannot exceed 100%.')
-    .default(0),
+    .max(100, 'Discount percentage cannot exceed 100%.'),
   discountedPrice: z.coerce
     .number()
-    .min(0, 'Discounted price cannot be negative.')
-    .default(0),
+    .min(0, 'Discounted price cannot be negative.'),
   sourceCurrency: z.string().min(3, 'Please select a currency.'),
   targetCurrency: z.string().min(3, 'Please select a currency.'),
   exchangeRate: z.coerce.number().positive('Exchange rate must be positive.'),

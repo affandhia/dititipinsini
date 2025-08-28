@@ -93,7 +93,6 @@ export function CalculatorCard() {
 
   // Handle discount percentage change
   const handleDiscountPercentageChange = (percentage: number) => {
-    setValue('discountPercentage', percentage);
     if (originalPrice > 0 && percentage >= 0 && percentage <= 100) {
       const newDiscountedPrice = originalPrice * (1 - percentage / 100);
       setValue('discountedPrice', newDiscountedPrice);
@@ -102,7 +101,6 @@ export function CalculatorCard() {
 
   // Handle discounted price change
   const handleDiscountedPriceChange = (price: number) => {
-    setValue('discountedPrice', price);
     if (originalPrice > 0 && price >= 0) {
       const newDiscountPercentage =
         ((originalPrice - price) / originalPrice) * 100;
@@ -431,11 +429,12 @@ export function CalculatorCard() {
                                           )}
                                           step="0.1"
                                           type="number"
-                                          onChange={(e) =>
+                                          onChange={(e) => {
+                                            field.onChange(e.target.value);
                                             handleDiscountPercentageChange(
                                               Number(e.target.value)
-                                            )
-                                          }
+                                            );
+                                          }}
                                         />
                                       </InputBaseControl>
 
@@ -464,11 +463,12 @@ export function CalculatorCard() {
                                       )}
                                       step="0.01"
                                       type="number"
-                                      onChange={(e) =>
+                                      onChange={(e) => {
+                                        field.onChange(e.target.value);
                                         handleDiscountedPriceChange(
                                           Number(e.target.value)
-                                        )
-                                      }
+                                        );
+                                      }}
                                     />
                                   </FormControl>
                                 </FormItem>

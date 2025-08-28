@@ -22,7 +22,10 @@
     },
     "actions": {
       "calculateTotal": "Hitung Total",
-      "reset": "Reset"
+      "reset": "Reset",
+      "copyResults": "Salin Hasil",
+      "copied": "Tersalin!",
+      "copyFailed": "Gagal menyalin"
     },
     "status": {
       "loadingExchangeRates": "Lagi memuat data kurs..."

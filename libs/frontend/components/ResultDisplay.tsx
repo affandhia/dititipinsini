@@ -13,6 +13,8 @@ import { useTranslation } from '@/libs/i18n/client';
 
 import { cn } from '../utils';
 
+import { CopyButton } from './CopyButton';
+
 interface FeeCalculation {
   label: string;
   amount: number;
@@ -142,6 +144,12 @@ export function ResultDisplay({
           <span className="font-semibold">
             {formatCurrency(subtotal, targetCurrency)}
           </span>
+          <CopyButton
+            className="h-8 px-3"
+            size="sm"
+            textToCopy={subtotal.toString()}
+            variant="ghost"
+          />
         </div>
 
         {/* Final Total */}
@@ -152,6 +160,12 @@ export function ResultDisplay({
           <span className="font-bold text-primary">
             {formatCurrency(finalTotal, targetCurrency)}
           </span>
+          <CopyButton
+            className="h-8 px-3"
+            size="sm"
+            textToCopy={finalTotal.toString()}
+            variant="ghost"
+          />
         </div>
       </div>
     </div>

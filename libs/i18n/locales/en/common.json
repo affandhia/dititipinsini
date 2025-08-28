@@ -22,7 +22,10 @@
     },
     "actions": {
       "calculateTotal": "Calculate Total",
-      "reset": "Reset"
+      "reset": "Reset",
+      "copyResults": "Copy Results",
+      "copied": "Copied!",
+      "copyFailed": "Copy failed"
     },
     "status": {
       "loadingExchangeRates": "Loading exchange rates..."

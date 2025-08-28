@@ -425,6 +425,57 @@ export function CalculatorCard() {
                         )}
                       </CollapsibleContent>
                     </Collapsible>
+
+                    <Collapsible className="rounded-lg border bg-card p-4 text-card-foreground">
+                      <CollapsibleTrigger asChild>
+                        <h3 className="flex cursor-pointer flex-row items-center justify-between text-lg font-semibold select-none">
+                          {t('calculator.config.title', {
+                            defaultValue: 'User Config',
+                          })}
+                          <ChevronsUpDown size="14" />
+                          <span className="sr-only">{'Toggle'}</span>
+                        </h3>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-4 pt-4">
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={watchedUserConfigValues.shouldShowPresets}
+                            id="should-show-preset"
+                            onCheckedChange={(value) =>
+                              userConfigForm.setValue(
+                                'shouldShowPresets',
+                                value
+                              )
+                            }
+                          />
+                          <Label htmlFor="should-show-preset">
+                            {t('calculator.fields.shouldShowPresets', {
+                              defaultValue: 'Show Presets',
+                            })}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={isDrawerView}
+                            id="drawer-mode"
+                            onCheckedChange={(value) => {
+                              userConfigForm.setValue(
+                                'resultView',
+                                value ? 'drawer' : 'inline'
+                              );
+                              if (value) {
+                                userConfigForm.setValue('isDrawerOpen', true);
+                              }
+                            }}
+                          />
+                          <Label htmlFor="drawer-mode">
+                            {t('calculator.fields.drawerMode', {
+                              defaultValue: 'Drawer Mode',
+                            })}
+                          </Label>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                     <div className="rounded-lg border bg-card p-4 text-card-foreground">
                       <h3 className="mb-4 text-lg font-semibold">
                         {t('calculator.sections.itemCurrency')}
@@ -435,7 +486,11 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.originalPrice')}
                           name="originalPrice"
-                          presets={watchedCalculatorValues.originalPricePresets}
+                          presets={
+                            watchedUserConfigValues.shouldShowPresets
+                              ? watchedCalculatorValues.originalPricePresets
+                              : []
+                          }
                           onAddPreset={(value) =>
                             handleAddPreset('originalPricePresets', value)
                           }
@@ -548,7 +603,11 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.netFee')}
                           name="netFee"
-                          presets={watchedCalculatorValues.netFeePresets}
+                          presets={
+                            watchedUserConfigValues.shouldShowPresets
+                              ? watchedCalculatorValues.netFeePresets
+                              : []
+                          }
                           onAddPreset={(value) =>
                             handleAddPreset('netFeePresets', value)
                           }
@@ -561,7 +620,11 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.baggageFee')}
                           name="baggageFee"
-                          presets={watchedCalculatorValues.baggageFeePresets}
+                          presets={
+                            watchedUserConfigValues.shouldShowPresets
+                              ? watchedCalculatorValues.baggageFeePresets
+                              : []
+                          }
                           onAddPreset={(value) =>
                             handleAddPreset('baggageFeePresets', value)
                           }
@@ -574,7 +637,11 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.deliveryFee')}
                           name="deliveryFee"
-                          presets={watchedCalculatorValues.deliveryFeePresets}
+                          presets={
+                            watchedUserConfigValues.shouldShowPresets
+                              ? watchedCalculatorValues.deliveryFeePresets
+                              : []
+                          }
                           onAddPreset={(value) =>
                             handleAddPreset('deliveryFeePresets', value)
                           }
@@ -587,7 +654,11 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.packagingFee')}
                           name="packagingFee"
-                          presets={watchedCalculatorValues.packagingFeePresets}
+                          presets={
+                            watchedUserConfigValues.shouldShowPresets
+                              ? watchedCalculatorValues.packagingFeePresets
+                              : []
+                          }
                           onAddPreset={(value) =>
                             handleAddPreset('packagingFeePresets', value)
                           }
@@ -618,12 +689,15 @@ export function CalculatorCard() {
                       <Switch
                         checked={isDrawerView}
                         id="drawer-mode"
-                        onCheckedChange={(value) =>
+                        onCheckedChange={(value) => {
                           userConfigForm.setValue(
                             'resultView',
                             value ? 'drawer' : 'inline'
-                          )
-                        }
+                          );
+                          if (value) {
+                            userConfigForm.setValue('isDrawerOpen', true);
+                          }
+                        }}
                       />
                       <Label htmlFor="drawer-mode">
                         {t('calculator.fields.drawerMode', {

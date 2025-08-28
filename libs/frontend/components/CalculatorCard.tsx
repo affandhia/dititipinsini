@@ -7,7 +7,7 @@ import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'react-use';
 import { type z } from 'zod';
 
-import { validatedConfig } from '@/config/validate';
+import { validatedCalculatorConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
 import { Checkbox } from '@/libs/frontend/components/core/checkbox';
 import {
@@ -41,6 +41,8 @@ import {
   InputBaseControl,
   InputBaseInput,
 } from './core/input-base';
+import { Label } from './core/label';
+import { Switch } from './core/switch';
 import { CurrencySelector } from './CurrencySelector';
 import { ExchangeRateInput } from './ExchangeRateInput';
 import { FeeInput } from './FeeInput';
@@ -50,34 +52,37 @@ import { ResultDisplay } from './ResultDisplay';
 type CalculatorFormValues = z.infer<typeof calculatorSchema>;
 
 // Default state with comprehensive initial values
-const defaultFormValues: CalculatorFormValues = validatedConfig;
+const defaultCalculatorValues: CalculatorFormValues = validatedCalculatorConfig;
 
-const FORM_VALUES_KEY = 'calculator-form-state';
+const CALCULATOR_FORM_VALUES_KEY = 'calculator-form-state';
 const DRAWER_SNAP_POINTS = [0.32, 0.8, 1]; // 50%, 70%, and 100% of screen height
 
 export function CalculatorCard() {
   const { t } = useTranslation('common');
+  const [resultView, setResultView] = useState<'drawer' | 'inline'>('drawer');
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   // State persistence with useLocalStorage
-  const [formValues, setFormValues] = useLocalStorage<CalculatorFormValues>(
-    FORM_VALUES_KEY,
-    defaultFormValues
-  );
+  const [storedCalculatorValues, storeCalculatorValues] =
+    useLocalStorage<CalculatorFormValues>(
+      CALCULATOR_FORM_VALUES_KEY,
+      defaultCalculatorValues
+    );
 
   // Form initialization
-  const form = useForm<CalculatorFormValues>({
+  const calculatorForm = useForm<CalculatorFormValues>({
     resolver: zodResolver(calculatorSchema) as Resolver<CalculatorFormValues>,
-    defaultValues: formValues,
+    defaultValues: storedCalculatorValues,
     mode: 'all',
   });
 
-  const { watch, control, handleSubmit, setValue } = form;
-
   // Get current form values without watching for changes
-  const watchedValues = watch();
+  const watchedValues = calculatorForm.watch();
   useEffect(() => {
-    localStorage.setItem(FORM_VALUES_KEY, JSON.stringify(watchedValues));
+    localStorage.setItem(
+      CALCULATOR_FORM_VALUES_KEY,
+      JSON.stringify(watchedValues)
+    );
   }, [watchedValues]);
 
   // Handle discount calculations - bidirectional updates
@@ -86,16 +91,16 @@ export function CalculatorCard() {
   // Reset discount fields when discount is disabled
   useEffect(() => {
     if (!hasDiscount) {
-      setValue('discountPercentage', 0);
-      setValue('discountedPrice', 0);
+      calculatorForm.setValue('discountPercentage', 0);
+      calculatorForm.setValue('discountedPrice', 0);
     }
-  }, [hasDiscount, setValue]);
+  }, [hasDiscount, calculatorForm.setValue]);
 
   // Handle discount percentage change
   const handleDiscountPercentageChange = (percentage: number) => {
     if (originalPrice > 0 && percentage >= 0 && percentage <= 100) {
       const newDiscountedPrice = originalPrice * (1 - percentage / 100);
-      setValue('discountedPrice', newDiscountedPrice);
+      calculatorForm.setValue('discountedPrice', newDiscountedPrice);
     }
   };
 
@@ -105,7 +110,7 @@ export function CalculatorCard() {
       const newDiscountPercentage =
         ((originalPrice - price) / originalPrice) * 100;
       if (newDiscountPercentage >= 0 && newDiscountPercentage <= 100) {
-        setValue('discountPercentage', newDiscountPercentage);
+        calculatorForm.setValue('discountPercentage', newDiscountPercentage);
       }
     }
   };
@@ -128,13 +133,13 @@ export function CalculatorCard() {
         exchangeRateData[watchedValues.sourceCurrency.toLowerCase()]?.[
           watchedValues.targetCurrency.toLowerCase()
         ];
-      form.setValue('exchangeRate', apiRate);
+      calculatorForm.setValue('exchangeRate', apiRate);
     }
   }, [
     exchangeRateData,
     watchedValues.sourceCurrency,
     watchedValues.targetCurrency,
-    form,
+    calculatorForm,
   ]);
 
   // Function to refresh exchange rate from API
@@ -146,7 +151,7 @@ export function CalculatorCard() {
           watchedValues.targetCurrency.toLowerCase()
         ];
       if (apiRate) {
-        form.setValue('exchangeRate', apiRate);
+        calculatorForm.setValue('exchangeRate', apiRate);
       }
     }
   };
@@ -169,12 +174,15 @@ export function CalculatorCard() {
       | 'packagingFeePresets',
     value: number | { type: 'fixed' | 'percentage'; value: number }
   ) => {
-    const currentPresets = form.getValues(field);
+    const currentPresets = calculatorForm.getValues(field);
 
     if (field === 'originalPricePresets') {
-      form.setValue(field, [...(currentPresets as number[]), value as number]);
+      calculatorForm.setValue(field, [
+        ...(currentPresets as number[]),
+        value as number,
+      ]);
     } else {
-      form.setValue(field, [
+      calculatorForm.setValue(field, [
         ...(currentPresets as {
           type: 'fixed' | 'percentage';
           value: number;
@@ -194,13 +202,13 @@ export function CalculatorCard() {
       | 'packagingFeePresets',
     index: number
   ) => {
-    const currentPresets = form.getValues(field);
+    const currentPresets = calculatorForm.getValues(field);
 
     if (field === 'originalPricePresets') {
       const updatedPresets = (currentPresets as number[]).filter(
         (_, i) => i !== index
       );
-      form.setValue(field, updatedPresets);
+      calculatorForm.setValue(field, updatedPresets);
     } else {
       const updatedPresets = (
         currentPresets as {
@@ -208,7 +216,7 @@ export function CalculatorCard() {
           value: number;
         }[]
       ).filter((_, i) => i !== index);
-      form.setValue(field, updatedPresets);
+      calculatorForm.setValue(field, updatedPresets);
     }
   };
 
@@ -309,23 +317,28 @@ export function CalculatorCard() {
 
   const onSubmit = (data: CalculatorFormValues) => {
     // Save form values to localStorage on submit
-    setFormValues(data);
+    storeCalculatorValues(data);
     console.warn('Form submitted and saved to localStorage');
   };
 
   const resetForm = () => {
-    form.reset(defaultFormValues);
-    setFormValues(defaultFormValues);
+    calculatorForm.reset(defaultCalculatorValues);
+    storeCalculatorValues(defaultCalculatorValues);
   };
 
+  const isDrawerView = resultView === 'drawer';
+  const isInlineView = resultView === 'inline';
   return (
     <>
       {/* Main Content - ResultDisplay */}
       <div className="mx-auto max-w-4xl space-y-8 p-6 pb-96">
         <div className="flex justify-center">
           <div className="w-full max-w-2xl">
-            <Form {...form}>
-              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <Form {...calculatorForm}>
+              <form
+                className="space-y-6"
+                onSubmit={calculatorForm.handleSubmit(onSubmit)}
+              >
                 <div className="grid gap-6 md:grid-cols-2">
                   {/* Left Column - Item & Currency */}
                   <div className="space-y-6">
@@ -339,21 +352,21 @@ export function CalculatorCard() {
                       </CollapsibleTrigger>
                       <CollapsibleContent className="space-y-4 pt-4">
                         <CurrencySelector
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.sourceCurrency')}
                           listName="sourceCurrencyList"
                           name="sourceCurrency"
                         />
 
                         <CurrencySelector
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.targetCurrency')}
                           listName="targetCurrencyList"
                           name="targetCurrency"
                         />
 
                         <ExchangeRateInput
-                          control={control}
+                          control={calculatorForm.control}
                           isLoading={isLoadingRates}
                           label={t('calculator.fields.exchangeRate')}
                           name="exchangeRate"
@@ -376,7 +389,7 @@ export function CalculatorCard() {
 
                       <div className="space-y-4">
                         <NumericInputWithPresets
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.originalPrice')}
                           name="originalPrice"
                           presets={watchedValues.originalPricePresets}
@@ -390,7 +403,7 @@ export function CalculatorCard() {
 
                         {/* Discount Section */}
                         <FormField
-                          control={control}
+                          control={calculatorForm.control}
                           name="hasDiscount"
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center space-y-0 space-x-3">
@@ -410,7 +423,7 @@ export function CalculatorCard() {
                         {hasDiscount && (
                           <div className="flex flex-col gap-4">
                             <FormField
-                              control={control}
+                              control={calculatorForm.control}
                               name="discountPercentage"
                               render={({ field }) => (
                                 <FormItem>
@@ -447,7 +460,7 @@ export function CalculatorCard() {
                               )}
                             />
                             <FormField
-                              control={control}
+                              control={calculatorForm.control}
                               name="discountedPrice"
                               render={({ field }) => (
                                 <FormItem>
@@ -489,7 +502,7 @@ export function CalculatorCard() {
 
                       <div className="space-y-6">
                         <FeeInput
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.netFee')}
                           name="netFee"
                           presets={watchedValues.netFeePresets}
@@ -502,7 +515,7 @@ export function CalculatorCard() {
                         />
 
                         <FeeInput
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.baggageFee')}
                           name="baggageFee"
                           presets={watchedValues.baggageFeePresets}
@@ -515,7 +528,7 @@ export function CalculatorCard() {
                         />
 
                         <FeeInput
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.deliveryFee')}
                           name="deliveryFee"
                           presets={watchedValues.deliveryFeePresets}
@@ -528,7 +541,7 @@ export function CalculatorCard() {
                         />
 
                         <FeeInput
-                          control={control}
+                          control={calculatorForm.control}
                           label={t('calculator.fields.packagingFee')}
                           name="packagingFee"
                           presets={watchedValues.packagingFeePresets}
@@ -552,29 +565,61 @@ export function CalculatorCard() {
                     {t('calculator.actions.reset')}
                   </Button>
                 </div>
+
+                <div className="flex flex-row justify-between">
+                  {t('calculator.results.costBreakdown')}
+                  <div className="flex items-center">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={isDrawerView}
+                        id="drawer-mode"
+                        onCheckedChange={(value) =>
+                          setResultView(value ? 'drawer' : 'inline')
+                        }
+                      />
+                      <Label htmlFor="drawer-mode">
+                        {t('calculator.fields.drawerMode', {
+                          defaultValue: 'Drawer Mode',
+                        })}
+                      </Label>
+                    </div>
+                    {isDrawerView && !isDrawerOpen && (
+                      <div className="flex justify-center space-x-2">
+                        {/* implement button to set drawer open true */}
+                        <Button
+                          className="bg-primary"
+                          onClick={() => setIsDrawerOpen(true)}
+                        >
+                          {t('calculator.show', { defaultValue: 'Show' })}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {isInlineView && (
+                  <ResultDisplay
+                    discountedPrice={watchedValues.discountedPrice}
+                    exchangeRate={exchangeRate}
+                    fees={fees}
+                    finalTotal={finalTotal}
+                    hasDiscount={watchedValues.hasDiscount}
+                    originalPrice={watchedValues.originalPrice}
+                    sourceCurrency={watchedValues.sourceCurrency}
+                    subtotal={subtotal}
+                    targetCurrency={watchedValues.targetCurrency}
+                  />
+                )}
               </form>
             </Form>
           </div>
         </div>
-
-        {/* Snap point indicators */}
-        {!isDrawerOpen && (
-          <div className="mb-80 flex justify-center space-x-2">
-            {/* implement button to set drawer open true */}
-            <Button
-              className="bg-primary"
-              onClick={() => setIsDrawerOpen(true)}
-            >
-              {t('calculator.results.costBreakdown')}
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Bottom Drawer with Form */}
       <Drawer
         modal={false}
-        open={isDrawerOpen}
+        open={isDrawerView && isDrawerOpen}
         snapPoints={DRAWER_SNAP_POINTS}
         onOpenChange={setIsDrawerOpen}
       >
@@ -583,26 +628,30 @@ export function CalculatorCard() {
             <DrawerTitle>{t('calculator.results.costBreakdown')}</DrawerTitle>
           </DrawerHeader>
 
-          <ResultDisplay
-            className="mx-6 overflow-y-auto"
-            discountedPrice={watchedValues.discountedPrice}
-            exchangeRate={exchangeRate}
-            fees={fees}
-            finalTotal={finalTotal}
-            hasDiscount={watchedValues.hasDiscount}
-            originalPrice={watchedValues.originalPrice}
-            sourceCurrency={watchedValues.sourceCurrency}
-            subtotal={subtotal}
-            targetCurrency={watchedValues.targetCurrency}
-          />
+          {isDrawerView && (
+            <>
+              <ResultDisplay
+                className="mx-6 overflow-y-auto"
+                discountedPrice={watchedValues.discountedPrice}
+                exchangeRate={exchangeRate}
+                fees={fees}
+                finalTotal={finalTotal}
+                hasDiscount={watchedValues.hasDiscount}
+                originalPrice={watchedValues.originalPrice}
+                sourceCurrency={watchedValues.sourceCurrency}
+                subtotal={subtotal}
+                targetCurrency={watchedValues.targetCurrency}
+              />
 
-          <DrawerFooter className="px-6 pt-6">
-            <DrawerClose asChild>
-              <Button type="button" variant="secondary">
-                {t('calculator.actions.close', { defaultValue: 'Close' })}
-              </Button>
-            </DrawerClose>
-          </DrawerFooter>
+              <DrawerFooter className="px-6 pt-6">
+                <DrawerClose asChild>
+                  <Button type="button" variant="secondary">
+                    {t('calculator.actions.close', { defaultValue: 'Close' })}
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </>
+          )}
         </DrawerContent>
       </Drawer>
     </>

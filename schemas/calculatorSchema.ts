@@ -5,6 +5,11 @@ const feeSchema = z.object({
   value: z.coerce.number().min(0, 'Value cannot be negative.'),
 });
 
+export const userConfigSchema = z.object({
+  resultView: z.enum(['drawer', 'inline']).default('drawer'),
+  shouldShowPresets: z.boolean().default(true),
+});
+
 export const calculatorSchema = z.object({
   originalPrice: z.coerce.number().positive('Price must be positive.'),
   hasDiscount: z.boolean().default(false),
@@ -33,4 +38,5 @@ export const calculatorSchema = z.object({
   packagingFeePresets: z.array(feeSchema),
 });
 
+export type UserConfigFormValues = z.infer<typeof userConfigSchema>;
 export type CalculatorFormValues = z.infer<typeof calculatorSchema>;

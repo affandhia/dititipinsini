@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from '@/libs/frontend/components/core/form';
 import { Input } from '@/libs/frontend/components/core/input';
+import { Label } from '@/libs/frontend/components/core/label';
 import { Switch } from '@/libs/frontend/components/core/switch';
 import {
   ToggleGroup,
@@ -149,7 +150,9 @@ export function FeeInput({ control, name, label }: FeeInputProps) {
               id={`switch-${name}`}
               onCheckedChange={field.onChange}
             />
-            <span className="font-medium">{label}</span>
+            <Label className="font-medium" htmlFor={`switch-${name}`}>
+              {label}
+            </Label>
           </div>
         )}
       />

@@ -178,52 +178,56 @@ export const formatCurrency = (
   currencyCode: string,
   locale: string = 'en-US'
 ): string => {
+  const upperCurrencyCode = currencyCode.toUpperCase();
+  const currency = WORLD_CURRENCIES.find(
+    (c) => c.code.toLowerCase() === currencyCode.toLowerCase()
+  );
+  const symbol = currency?.symbol || upperCurrencyCode;
+  const specialFormatting =
+    SPECIAL_CURRENCY_FORMATTING[
+      upperCurrencyCode as keyof typeof SPECIAL_CURRENCY_FORMATTING
+    ];
+
+  // Use special formatting if available, otherwise default to 2 decimal places
+  const fractionDigits = specialFormatting
+    ? {
+        minimumFractionDigits: specialFormatting.minimumFractionDigits,
+        maximumFractionDigits: specialFormatting.maximumFractionDigits,
+      }
+    : {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      };
+
   try {
-    const upperCurrencyCode = currencyCode.toUpperCase();
-    const specialFormatting =
-      SPECIAL_CURRENCY_FORMATTING[
-        upperCurrencyCode as keyof typeof SPECIAL_CURRENCY_FORMATTING
-      ];
-
-    // Use special formatting if available, otherwise default to 2 decimal places
-    const fractionDigits = specialFormatting
-      ? {
-          minimumFractionDigits: specialFormatting.minimumFractionDigits,
-          maximumFractionDigits: specialFormatting.maximumFractionDigits,
-        }
-      : {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        };
-
-    return new Intl.NumberFormat(locale, {
+    // Format using Intl.NumberFormat, but replace the currency symbol with our own
+    const formatted = new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: upperCurrencyCode,
       ...fractionDigits,
     }).format(amount);
+
+    // Replace the default symbol with our symbol if different
+    // This works for most locales where symbol is at the start or end
+    if (currency) {
+      // Remove the default symbol using regex, then prepend our symbol
+      // Example: $1,000.00 -> 1,000.00, then Rp 1,000.00
+      const defaultSymbol = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: upperCurrencyCode,
+        ...fractionDigits,
+      })
+        .formatToParts(amount)
+        .find((part) => part.type === 'currency')?.value;
+      if (defaultSymbol && defaultSymbol !== symbol) {
+        // Remove only the first occurrence of the default symbol
+        const replaced = formatted.replace(defaultSymbol, symbol);
+        return replaced;
+      }
+    }
+    return formatted;
   } catch (_error) {
     // Fallback formatting if currency code is not supported
-    const currency = WORLD_CURRENCIES.find(
-      (c) => c.code.toLowerCase() === currencyCode.toLowerCase()
-    );
-    const symbol = currency?.symbol || currencyCode.toUpperCase();
-    const upperCurrencyCode = currencyCode.toUpperCase();
-    const specialFormatting =
-      SPECIAL_CURRENCY_FORMATTING[
-        upperCurrencyCode as keyof typeof SPECIAL_CURRENCY_FORMATTING
-      ];
-
-    // Use special formatting if available, otherwise default to 2 decimal places
-    const fractionDigits = specialFormatting
-      ? {
-          minimumFractionDigits: specialFormatting.minimumFractionDigits,
-          maximumFractionDigits: specialFormatting.maximumFractionDigits,
-        }
-      : {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        };
-
     return `${symbol} ${amount.toLocaleString(locale, fractionDigits)}`;
   }
 };

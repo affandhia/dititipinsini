@@ -1,5 +1,7 @@
 {
   "resultView": "drawer",
   "isDrawerOpen": true,
-  "shouldShowPresets": true
+  "shouldShowPresets": true,
+  "locale": "id",
+  "theme": "system"
 }

@@ -137,11 +137,11 @@ export function ResultDisplay({
 
         {/* TOTAL TO PAY Section */}
         <div className="border-t-2 border-primary/20 pt-4">
-          <div className="flex items-center justify-between text-xl">
+          <div className="flex flex-col gap-1 text-xl sm:flex-row sm:items-center sm:justify-between">
             <span className="font-bold text-primary">
               {t('calculator.results.totalToPay')}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-row gap-1 sm:items-center sm:gap-2">
               <span className="font-bold text-primary">
                 {formatCurrency(finalTotal, targetCurrency)}
               </span>

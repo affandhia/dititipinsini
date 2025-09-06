@@ -172,66 +172,23 @@ export function CalculatorCard() {
     ] ||
     1;
 
-  // Preset management function
-  const handleAddPreset = (
-    field:
-      | 'originalPricePresets'
-      | 'netFeePresets'
-      | 'baggageFeePresets'
-      | 'deliveryFeePresets'
-      | 'packagingFeePresets',
-    value: number | { type: 'fixed' | 'percentage'; value: number | null }
-  ) => {
-    const currentPresets = calculatorForm.getValues(field);
-
-    if (field === 'originalPricePresets') {
-      // For originalPrice, value should be a number
-      if (typeof value === 'number') {
-        calculatorForm.setValue(field, [
-          ...(currentPresets as number[]),
-          value,
-        ]);
-      }
-    } else {
-      // For fee presets, check if value.value is not null before adding
-      if (typeof value === 'object' && value.value !== null) {
-        calculatorForm.setValue(field, [
-          ...(currentPresets as {
-            type: 'fixed' | 'percentage';
-            value: number;
-          }[]),
-          { type: value.type, value: value.value },
-        ]);
-      }
+  // Preset management for originalPrice only
+  const handleAddOriginalPricePreset = (value: number) => {
+    const currentPresets = calculatorForm.getValues('originalPricePresets');
+    if (typeof value === 'number') {
+      calculatorForm.setValue('originalPricePresets', [
+        ...(currentPresets as number[]),
+        value,
+      ]);
     }
   };
 
-  // Preset removal function
-  const handleRemovePreset = (
-    field:
-      | 'originalPricePresets'
-      | 'netFeePresets'
-      | 'baggageFeePresets'
-      | 'deliveryFeePresets'
-      | 'packagingFeePresets',
-    index: number
-  ) => {
-    const currentPresets = calculatorForm.getValues(field);
-
-    if (field === 'originalPricePresets') {
-      const updatedPresets = (currentPresets as number[]).filter(
-        (_, i) => i !== index
-      );
-      calculatorForm.setValue(field, updatedPresets);
-    } else {
-      const updatedPresets = (
-        currentPresets as {
-          type: 'fixed' | 'percentage';
-          value: number;
-        }[]
-      ).filter((_, i) => i !== index);
-      calculatorForm.setValue(field, updatedPresets);
-    }
+  const handleRemoveOriginalPricePreset = (index: number) => {
+    const currentPresets = calculatorForm.getValues('originalPricePresets');
+    const updatedPresets = (currentPresets as number[]).filter(
+      (_, i) => i !== index
+    );
+    calculatorForm.setValue('originalPricePresets', updatedPresets);
   };
 
   // Calculation logic
@@ -244,6 +201,10 @@ export function CalculatorCard() {
       baggageFee,
       deliveryFee,
       packagingFee,
+      withNetFee,
+      withBaggageFee,
+      withDeliveryFee,
+      withPackagingFee,
     } = watchedCalculatorValues;
 
     if (!originalPrice || originalPrice <= 0) {
@@ -259,78 +220,58 @@ export function CalculatorCard() {
       hasDiscount && discountedPrice > 0 ? discountedPrice : originalPrice;
     const convertedBasePrice = Number(nstr(basePrice * exchangeRate));
 
-    // Calculate each fee
-    const netFeeAmount = Number(
-      nstr(
-        netFee.type === 'percentage'
-          ? (convertedBasePrice * (netFee.value ?? 0)) / 100
-          : (netFee.value ?? 0)
-      )
-    );
-
-    const baggageFeeAmount = Number(
-      nstr(
-        baggageFee.type === 'percentage'
-          ? (convertedBasePrice * (baggageFee.value ?? 0)) / 100
-          : (baggageFee.value ?? 0)
-      )
-    );
-
-    const deliveryFeeAmount = Number(
-      nstr(
-        deliveryFee.type === 'percentage'
-          ? (convertedBasePrice * (deliveryFee.value ?? 0)) / 100
-          : (deliveryFee.value ?? 0)
-      )
-    );
-
-    const packagingFeeAmount = Number(
-      nstr(
-        packagingFee.type === 'percentage'
-          ? (convertedBasePrice * (packagingFee.value ?? 0)) / 100
-          : (packagingFee.value ?? 0)
-      )
-    );
-
-    const fees = [
+    // Define fee configurations for extensibility
+    const feeConfigs = [
       {
+        enabled: withNetFee,
+        fee: netFee,
         label: t('calculator.fields.netFee'),
-        amount: netFeeAmount,
-        displayValue:
-          netFee.type === 'percentage'
-            ? `${nstr(netFee.value ?? 0)}%`
-            : `${t('calculator.feeTypes.fixed')}`,
+        key: 'netFee',
       },
       {
+        enabled: withBaggageFee,
+        fee: baggageFee,
         label: t('calculator.fields.baggageFee'),
-        amount: baggageFeeAmount,
-        displayValue:
-          baggageFee.type === 'percentage'
-            ? `${nstr(baggageFee.value ?? 0)}%`
-            : `${t('calculator.feeTypes.fixed')}`,
+        key: 'baggageFee',
       },
       {
+        enabled: withDeliveryFee,
+        fee: deliveryFee,
         label: t('calculator.fields.deliveryFee'),
-        amount: deliveryFeeAmount,
-        displayValue:
-          deliveryFee.type === 'percentage'
-            ? `${nstr(deliveryFee.value ?? 0)}%`
-            : `${t('calculator.feeTypes.fixed')}`,
+        key: 'deliveryFee',
       },
       {
+        enabled: withPackagingFee,
+        fee: packagingFee,
         label: t('calculator.fields.packagingFee'),
-        amount: packagingFeeAmount,
-        displayValue:
-          packagingFee.type === 'percentage'
-            ? `${nstr(packagingFee.value ?? 0)}%`
-            : `${t('calculator.feeTypes.fixed')}`,
+        key: 'packagingFee',
       },
     ];
 
+    // Calculate fees only if enabled
+    const calculatedFees = feeConfigs
+      .filter((config) => config.enabled)
+      .map((config) => {
+        const amount = Number(
+          nstr(
+            config.fee.type === 'percentage'
+              ? (convertedBasePrice * (config.fee.value ?? 0)) / 100
+              : (config.fee.value ?? 0)
+          )
+        );
+
+        return {
+          label: config.label,
+          amount,
+          displayValue:
+            config.fee.type === 'percentage'
+              ? `${nstr(config.fee.value ?? 0)}%`
+              : `${t('calculator.feeTypes.fixed')}`,
+        };
+      });
+
     const totalFees = Number(
-      nstr(
-        netFeeAmount + baggageFeeAmount + deliveryFeeAmount + packagingFeeAmount
-      )
+      nstr(calculatedFees.reduce((sum, fee) => sum + fee.amount, 0))
     );
     const subtotal = Number(nstr(convertedBasePrice + totalFees));
     const finalTotal = Number(nstr(subtotal));
@@ -338,7 +279,7 @@ export function CalculatorCard() {
     return {
       subtotal,
       finalTotal,
-      fees,
+      fees: calculatedFees,
     };
   };
 
@@ -441,12 +382,8 @@ export function CalculatorCard() {
                               ? watchedCalculatorValues.originalPricePresets
                               : []
                           }
-                          onAddPreset={(value) =>
-                            handleAddPreset('originalPricePresets', value)
-                          }
-                          onRemovePreset={(index) =>
-                            handleRemovePreset('originalPricePresets', index)
-                          }
+                          onAddPreset={handleAddOriginalPricePreset}
+                          onRemovePreset={handleRemoveOriginalPricePreset}
                         />
 
                         {/* Discount Section */}
@@ -553,68 +490,24 @@ export function CalculatorCard() {
                           control={calculatorForm.control}
                           label={t('calculator.fields.netFee')}
                           name="netFee"
-                          presets={
-                            shouldShowPresets
-                              ? watchedCalculatorValues.netFeePresets
-                              : []
-                          }
-                          onAddPreset={(value) =>
-                            handleAddPreset('netFeePresets', value)
-                          }
-                          onRemovePreset={(index) =>
-                            handleRemovePreset('netFeePresets', index)
-                          }
                         />
 
                         <FeeInput
                           control={calculatorForm.control}
                           label={t('calculator.fields.baggageFee')}
                           name="baggageFee"
-                          presets={
-                            shouldShowPresets
-                              ? watchedCalculatorValues.baggageFeePresets
-                              : []
-                          }
-                          onAddPreset={(value) =>
-                            handleAddPreset('baggageFeePresets', value)
-                          }
-                          onRemovePreset={(index) =>
-                            handleRemovePreset('baggageFeePresets', index)
-                          }
                         />
 
                         <FeeInput
                           control={calculatorForm.control}
                           label={t('calculator.fields.deliveryFee')}
                           name="deliveryFee"
-                          presets={
-                            shouldShowPresets
-                              ? watchedCalculatorValues.deliveryFeePresets
-                              : []
-                          }
-                          onAddPreset={(value) =>
-                            handleAddPreset('deliveryFeePresets', value)
-                          }
-                          onRemovePreset={(index) =>
-                            handleRemovePreset('deliveryFeePresets', index)
-                          }
                         />
 
                         <FeeInput
                           control={calculatorForm.control}
                           label={t('calculator.fields.packagingFee')}
                           name="packagingFee"
-                          presets={
-                            shouldShowPresets
-                              ? watchedCalculatorValues.packagingFeePresets
-                              : []
-                          }
-                          onAddPreset={(value) =>
-                            handleAddPreset('packagingFeePresets', value)
-                          }
-                          onRemovePreset={(index) =>
-                            handleRemovePreset('packagingFeePresets', index)
-                          }
                         />
                       </div>
                     </div>

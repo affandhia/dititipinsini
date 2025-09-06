@@ -20,6 +20,8 @@ import {
 } from '@/libs/frontend/components/core/toggle-group';
 import { useTranslation } from '@/libs/i18n/client';
 
+import { useConfig } from './UserConfigProvider';
+
 import type {
   CalculatorFormValues,
   FeeSchemaType,
@@ -30,25 +32,49 @@ interface FeeInputProps {
   control: Control<CalculatorFormValues>;
   name: 'netFee' | 'baggageFee' | 'deliveryFee' | 'packagingFee';
   label: string;
-  presets: FeeSchemaType[];
-  onAddPreset: (preset: FeeSchemaType) => void;
-  onRemovePreset: (index: number) => void;
 }
 
-export function FeeInput({
-  control,
-  name,
-  label,
-  presets,
-  onAddPreset,
-  onRemovePreset,
-}: FeeInputProps) {
+export function FeeInput({ control, name, label }: FeeInputProps) {
   const { t } = useTranslation('common');
   const { getValues, setValue } = useFormContext<CalculatorFormValues>();
+  const { shouldShowPresets } = useConfig();
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(
     null
   );
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Get presets from form values
+  const presetField = `${name}Presets` as
+    | 'netFeePresets'
+    | 'baggageFeePresets'
+    | 'deliveryFeePresets'
+    | 'packagingFeePresets';
+  const presets = shouldShowPresets
+    ? (getValues(presetField) as FeeSchemaType[])
+    : [];
+
+  // Internal preset management functions
+  const handleAddPreset = (preset: FeeSchemaType) => {
+    const currentPresets = getValues(presetField) as FeeSchemaType[];
+
+    // Check if preset already exists
+    const exists = currentPresets.some(
+      (p: FeeSchemaType) => p.type === preset.type && p.value === preset.value
+    );
+
+    if (!exists && preset.value !== null) {
+      setValue(presetField, [
+        ...currentPresets,
+        { type: preset.type, value: preset.value },
+      ]);
+    }
+  };
+
+  const handleRemovePreset = (index: number) => {
+    const currentPresets = getValues(presetField) as FeeSchemaType[];
+    const updatedPresets = currentPresets.filter((_, i) => i !== index);
+    setValue(presetField, updatedPresets);
+  };
 
   // Handle clicks outside to reset delete confirmation
   useEffect(() => {
@@ -70,7 +96,7 @@ export function FeeInput({
   const handlePresetClick = (preset: FeeSchemaType, index: number) => {
     if (deleteConfirmIndex === index) {
       // Second click - delete the preset
-      onRemovePreset(index);
+      handleRemovePreset(index);
       setDeleteConfirmIndex(null);
     } else {
       // First click - apply the preset
@@ -83,7 +109,7 @@ export function FeeInput({
     event.stopPropagation();
     if (deleteConfirmIndex === index) {
       // Confirm deletion
-      onRemovePreset(index);
+      handleRemovePreset(index);
       setDeleteConfirmIndex(null);
     } else {
       // Enter delete confirmation mode
@@ -202,12 +228,12 @@ export function FeeInput({
                           value: numValue,
                         };
                         const exists = presets.some(
-                          (p) =>
+                          (p: FeeSchemaType) =>
                             p.type === newPreset.type &&
                             p.value === newPreset.value
                         );
                         if (!exists) {
-                          onAddPreset(newPreset);
+                          handleAddPreset(newPreset);
                         }
                       }
                     }}

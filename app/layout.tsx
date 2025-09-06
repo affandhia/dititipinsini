@@ -1,8 +1,10 @@
 import React from 'react';
 
+import { Toaster } from '@/libs/frontend/components/core/sonner';
 import { QueryClientWrapper } from '@/libs/frontend/components/QueryClientWrapper';
 import { ThemeProvider } from '@/libs/frontend/components/ThemeProvider';
 import { ConfigFormProvider } from '@/libs/frontend/components/UserConfigProvider';
+
 // ...existing code...
 
 import type { Metadata, Viewport } from 'next';
@@ -65,10 +67,13 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="id">
-      <body className="dark">
+      <body>
         <ConfigFormProvider>
           <ThemeProvider>
-            <QueryClientWrapper>{children}</QueryClientWrapper>
+            <QueryClientWrapper>
+              {children}
+              <Toaster />
+            </QueryClientWrapper>
           </ThemeProvider>
         </ConfigFormProvider>
       </body>

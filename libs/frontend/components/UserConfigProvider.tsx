@@ -85,6 +85,7 @@ export function useConfig(): {
   setTheme: (value: UserConfigFormValues['theme']) => void;
   locale: string;
   setLocale: (value: string) => void;
+  reset: () => void;
 } {
   const { userConfigForm } = useConfigForm();
 
@@ -136,6 +137,10 @@ export function useConfig(): {
     [userConfigForm]
   );
 
+  const reset = useCallback((): void => {
+    userConfigForm.reset(defaultUserConfigValues);
+  }, [userConfigForm]);
+
   return {
     shouldShowPresets,
     setShowPresets,
@@ -148,5 +153,6 @@ export function useConfig(): {
     setTheme,
     locale,
     setLocale,
+    reset,
   };
 }

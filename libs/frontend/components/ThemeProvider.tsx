@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  ThemeProvider as NextThemesProvider,
+  useTheme as useNextTheme,
+} from 'next-themes';
 import * as React from 'react';
 
 import { useConfig } from '@/libs/frontend/components/UserConfigProvider';
@@ -7,8 +11,11 @@ import { useConfig } from '@/libs/frontend/components/UserConfigProvider';
 type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
+  // theme value coming from user config (light|dark|system)
   theme: Theme;
+  // setter will update user config's theme value
   setTheme: (theme: Theme) => void;
+  // resolved theme after next-themes resolves system -> light|dark
   actualTheme: 'light' | 'dark';
 }
 
@@ -17,68 +24,34 @@ const ThemeContext = React.createContext<ThemeContextType | undefined>(
 );
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, setTheme } = useConfig();
-  const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>(
-    'light'
+  const { theme } = useConfig();
+
+  // Wrap the app with next-themes provider so other libs (sonner) can consume it
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme={theme}
+      enableSystem={true}
+    >
+      <InnerThemeProvider>{children}</InnerThemeProvider>
+    </NextThemesProvider>
   );
+}
 
-  // Function to get system theme preference
-  const getSystemTheme = React.useCallback((): 'light' | 'dark' => {
-    if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-    }
-    return 'light';
-  }, []);
+function InnerThemeProvider({ children }: { children: React.ReactNode }) {
+  // useNextTheme is only available inside NextThemesProvider
+  const { setTheme: setNextTheme, resolvedTheme } = useNextTheme();
+  const { theme, setTheme } = useConfig();
 
-  // Function to apply theme to document
-  const applyTheme = React.useCallback((themeToApply: 'light' | 'dark') => {
-    if (typeof document !== 'undefined') {
-      const root = document.documentElement;
-      const body = document.body;
-
-      if (themeToApply === 'dark') {
-        root.classList.add('dark');
-        body.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-        body.classList.remove('dark');
-      }
-    }
-  }, []);
-
-  // Initialize theme on mount
+  // Sync useConfig theme changes to next-themes
   React.useEffect(() => {
-    const resolvedTheme =
-      theme === 'system'
-        ? getSystemTheme()
-        : theme === 'dark'
-          ? 'dark'
-          : 'light';
-    setActualTheme(resolvedTheme);
-    applyTheme(resolvedTheme);
-  }, [theme, getSystemTheme, applyTheme]);
-
-  // Listen for system theme changes
-  React.useEffect(() => {
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = () => {
-        const systemTheme = getSystemTheme();
-        setActualTheme(systemTheme);
-        applyTheme(systemTheme);
-      };
-
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-  }, [theme, getSystemTheme, applyTheme]);
+    setNextTheme(theme);
+  }, [theme, setNextTheme]);
 
   const value: ThemeContextType = {
     theme,
     setTheme,
-    actualTheme,
+    actualTheme: resolvedTheme === 'dark' ? 'dark' : 'light',
   };
 
   return (

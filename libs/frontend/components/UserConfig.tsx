@@ -1,6 +1,7 @@
 import { ChevronsUpDown } from 'lucide-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import {
   Collapsible,
@@ -11,13 +12,16 @@ import { Label } from '@/libs/frontend/components/core/label';
 import { Switch } from '@/libs/frontend/components/core/switch';
 import { useConfig } from '@/libs/frontend/components/UserConfigProvider';
 
+import { Button } from './core/button';
+
 export const UserConfig = memo(() => {
   const { t } = useTranslation();
   const {
     shouldShowPresets,
     setShowPresets,
     isDrawerView,
-    setResultViewMode: setDrawerMode,
+    setResultViewMode,
+    reset,
   } = useConfig();
 
   return (
@@ -51,13 +55,30 @@ export const UserConfig = memo(() => {
           <Switch
             checked={isDrawerView}
             id="drawer-mode"
-            onCheckedChange={setDrawerMode}
+            onCheckedChange={setResultViewMode}
           />
           <Label htmlFor="drawer-mode">
             {t('calculator.fields.drawerMode', {
               defaultValue: 'Drawer Mode',
             })}
           </Label>
+        </div>
+
+        <div className="pt-2">
+          <Button
+            className="w-full"
+            variant="destructive"
+            onClick={() => {
+              reset();
+              toast.success(
+                t('calculator.notifications.configReset', {
+                  defaultValue: 'Configuration has been reset.',
+                })
+              );
+            }}
+          >
+            {t('calculator.actions.reset', { defaultValue: 'Reset' })}
+          </Button>
         </div>
       </CollapsibleContent>
     </Collapsible>

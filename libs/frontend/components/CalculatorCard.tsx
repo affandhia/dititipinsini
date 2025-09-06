@@ -6,6 +6,7 @@ import nstr from 'nstr';
 import { useEffect } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'react-use';
+import { toast } from 'sonner';
 
 import { validatedCalculatorConfig } from '@/config/validate';
 import { Button } from '@/libs/frontend/components/core/button';
@@ -161,6 +162,11 @@ export function CalculatorCard() {
         ];
       if (apiRate) {
         calculatorForm.setValue('exchangeRate', Number(safeNstr(apiRate, 1)));
+        toast.success(
+          t('calculator.notifications.exchangeRateUpdated', {
+            defaultValue: 'Exchange rate updated from API.',
+          })
+        );
       }
     }
   };
@@ -318,6 +324,11 @@ export function CalculatorCard() {
   const resetForm = () => {
     calculatorForm.reset(defaultCalculatorValues);
     storeCalculatorValues(defaultCalculatorValues);
+    toast.success(
+      t('calculator.notifications.formReset', {
+        defaultValue: 'Form has been reset.',
+      })
+    );
   };
 
   // =========================
@@ -645,10 +656,12 @@ export function CalculatorCard() {
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <Button className="flex-1" type="submit">
-                    {t('calculator.actions.calculateTotal')}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={resetForm}>
+                  <Button
+                    className="flex-1"
+                    type="button"
+                    variant="outline"
+                    onClick={resetForm}
+                  >
                     {t('calculator.actions.reset')}
                   </Button>
                 </div>

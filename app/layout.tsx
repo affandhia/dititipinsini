@@ -10,10 +10,12 @@ import './globals.css';
 
 // Note: These metadata strings should be localized server-side using Next.js i18n
 // For now, we'll keep them as constants but could be moved to a metadata translation system
-const APP_NAME = 'PWA App';
-const APP_DEFAULT_TITLE = 'My Awesome PWA App';
-const APP_TITLE_TEMPLATE = '%s - PWA App';
-const APP_DESCRIPTION = 'Best PWA app in the world!';
+const APP_NAME = 'Dititpin Calculator';
+const APP_DEFAULT_TITLE =
+  'Dititpin Calculator - Personal Shopper Cost Calculator';
+const APP_TITLE_TEMPLATE = '%s - Dititpin Calculator';
+const APP_DESCRIPTION =
+  'Professional personal shopper cost calculator with multi-currency support for cross-border shopping services (jasa titip)';
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

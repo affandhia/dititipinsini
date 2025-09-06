@@ -2,6 +2,7 @@ import React from 'react';
 
 import { QueryClientWrapper } from '@/libs/frontend/components/QueryClientWrapper';
 import { ThemeProvider } from '@/libs/frontend/components/ThemeProvider';
+import { ConfigFormProvider } from '@/libs/frontend/components/UserConfigProvider';
 // ...existing code...
 
 import type { Metadata, Viewport } from 'next';
@@ -66,7 +67,9 @@ export default function RootLayout({
     <html suppressHydrationWarning lang="en">
       <body className="dark">
         <ThemeProvider>
-          <QueryClientWrapper>{children}</QueryClientWrapper>
+          <ConfigFormProvider>
+            <QueryClientWrapper>{children}</QueryClientWrapper>
+          </ConfigFormProvider>
         </ThemeProvider>
       </body>
     </html>

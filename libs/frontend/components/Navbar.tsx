@@ -15,6 +15,7 @@ import {
 } from '@/libs/frontend/components/core/sheet';
 import { LanguageSwitcher } from '@/libs/frontend/components/LanguageSwitcher';
 import { ThemeToggle } from '@/libs/frontend/components/ThemeToggle';
+import { UserConfig } from '@/libs/frontend/components/UserConfig';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,17 +68,8 @@ export function Navbar() {
               <SheetHeader>
                 <SheetTitle>{'Menu'}</SheetTitle>
               </SheetHeader>
-              <div className="mt-6 space-y-4">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.key}
-                    className="block text-sm font-medium transition-colors hover:text-primary"
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {t(`navbar.${item.key}`)}
-                  </Link>
-                ))}
+              <div className="space-y-4 px-4">
+                <UserConfig />
               </div>
             </SheetContent>
           </Sheet>

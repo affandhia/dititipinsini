@@ -1,11 +1,14 @@
 name: Build and Deploy
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - release
+
 permissions:
   contents: write
+
 jobs:
   build-and-deploy:
     name: ⚙️ Build & Deploy
@@ -14,6 +17,8 @@ jobs:
     steps:
       - name: 🛎️ Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4
@@ -53,6 +58,8 @@ jobs:
           folder: ${{ env.DEPLOY_PATH }} # The folder the action should deploy.
           branch: gh-pages # The branch to deploy to
           target-folder: / # Deploy to root for production
+          clean-exclude: |
+            dev
 
       - name: 🧪 Deploy Development
         if: github.ref == 'refs/heads/main'

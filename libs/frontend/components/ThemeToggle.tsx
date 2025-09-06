@@ -1,18 +1,21 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 
 import { Button } from '@/libs/frontend/components/core/button';
 import { useTheme } from '@/libs/frontend/components/ThemeProvider';
+import { cn } from '@/libs/frontend/utils';
 
 export function ThemeToggle() {
-  const { theme, setTheme, actualTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    if (theme === 'system') {
-      setTheme(actualTheme === 'light' ? 'dark' : 'light');
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
     } else {
-      setTheme(theme === 'light' ? 'dark' : 'light');
+      setTheme('light');
     }
   };
 
@@ -23,8 +26,24 @@ export function ThemeToggle() {
       variant="ghost"
       onClick={toggleTheme}
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+      <Sun
+        className={cn(
+          'h-[1.2rem] w-[1.2rem] transition-all',
+          theme === 'light' ? 'scale-100 rotate-0' : 'scale-0 -rotate-90'
+        )}
+      />
+      <Moon
+        className={cn(
+          'absolute h-[1.2rem] w-[1.2rem] transition-all',
+          theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 rotate-90'
+        )}
+      />
+      <Monitor
+        className={cn(
+          'absolute h-[1.2rem] w-[1.2rem] transition-all',
+          theme === 'system' ? 'scale-100 rotate-0' : 'scale-0 rotate-90'
+        )}
+      />
       <span className="sr-only">{'Toggle theme'}</span>
     </Button>
   );

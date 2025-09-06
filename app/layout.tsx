@@ -66,11 +66,11 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <body className="dark">
-        <ThemeProvider>
-          <ConfigFormProvider>
+        <ConfigFormProvider>
+          <ThemeProvider>
             <QueryClientWrapper>{children}</QueryClientWrapper>
-          </ConfigFormProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </ConfigFormProvider>
       </body>
     </html>
   );

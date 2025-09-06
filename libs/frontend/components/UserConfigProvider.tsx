@@ -81,6 +81,8 @@ export function useConfig(): {
   isDrawerOpen: boolean;
   setResultViewMode: (value: boolean) => void;
   setDrawerOpen: (value: boolean) => void;
+  theme: UserConfigFormValues['theme'];
+  setTheme: (value: UserConfigFormValues['theme']) => void;
 } {
   const { userConfigForm } = useConfigForm();
 
@@ -88,10 +90,11 @@ export function useConfig(): {
   // ===== USER CONFIG =======
   // =========================
   const isDrawerOpen = userConfigForm.watch('isDrawerOpen');
+  const theme = userConfigForm.watch('theme');
   const resultViewValue = userConfigForm.watch('resultView');
   const isDrawerView = resultViewValue === 'drawer';
   const isInlineView = resultViewValue === 'inline';
-  const shouldShowPresets = userConfigForm.watch('shouldShowPresets') ?? true;
+  const shouldShowPresets = userConfigForm.watch('shouldShowPresets');
   const setShowPresets = useCallback(
     (value: boolean): void => {
       userConfigForm.setValue('shouldShowPresets', value);
@@ -116,6 +119,13 @@ export function useConfig(): {
     [userConfigForm]
   );
 
+  const setTheme = useCallback(
+    (value: 'light' | 'dark' | 'system'): void => {
+      userConfigForm.setValue('theme', value);
+    },
+    [userConfigForm]
+  );
+
   return {
     shouldShowPresets,
     setShowPresets,
@@ -124,5 +134,7 @@ export function useConfig(): {
     isInlineView,
     isDrawerOpen,
     setDrawerOpen,
+    theme,
+    setTheme,
   };
 }

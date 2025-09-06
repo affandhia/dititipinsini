@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import { useConfig } from '@/libs/frontend/components/UserConfigProvider';
+
 type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
@@ -15,7 +17,7 @@ const ThemeContext = React.createContext<ThemeContextType | undefined>(
 );
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme>('system');
+  const { theme, setTheme } = useConfig();
   const [actualTheme, setActualTheme] = React.useState<'light' | 'dark'>(
     'light'
   );
@@ -48,19 +50,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize theme on mount
   React.useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    const initialTheme = savedTheme || 'system';
-    setTheme(initialTheme);
-
     const resolvedTheme =
-      initialTheme === 'system'
+      theme === 'system'
         ? getSystemTheme()
-        : initialTheme === 'dark'
+        : theme === 'dark'
           ? 'dark'
           : 'light';
     setActualTheme(resolvedTheme);
     applyTheme(resolvedTheme);
-  }, [getSystemTheme, applyTheme]);
+  }, [theme, getSystemTheme, applyTheme]);
 
   // Listen for system theme changes
   React.useEffect(() => {
@@ -75,19 +73,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     }
-  }, [theme, getSystemTheme, applyTheme]);
-
-  // Update theme when theme state changes
-  React.useEffect(() => {
-    localStorage.setItem('theme', theme);
-    const resolvedTheme =
-      theme === 'system'
-        ? getSystemTheme()
-        : theme === 'dark'
-          ? 'dark'
-          : 'light';
-    setActualTheme(resolvedTheme);
-    applyTheme(resolvedTheme);
   }, [theme, getSystemTheme, applyTheme]);
 
   const value: ThemeContextType = {

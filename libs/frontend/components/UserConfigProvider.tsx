@@ -83,6 +83,8 @@ export function useConfig(): {
   setDrawerOpen: (value: boolean) => void;
   theme: UserConfigFormValues['theme'];
   setTheme: (value: UserConfigFormValues['theme']) => void;
+  locale: string;
+  setLocale: (value: string) => void;
 } {
   const { userConfigForm } = useConfigForm();
 
@@ -90,6 +92,7 @@ export function useConfig(): {
   // ===== USER CONFIG =======
   // =========================
   const isDrawerOpen = userConfigForm.watch('isDrawerOpen');
+  const locale = userConfigForm.watch('locale');
   const theme = userConfigForm.watch('theme');
   const resultViewValue = userConfigForm.watch('resultView');
   const isDrawerView = resultViewValue === 'drawer';
@@ -126,6 +129,13 @@ export function useConfig(): {
     [userConfigForm]
   );
 
+  const setLocale = useCallback(
+    (value: string): void => {
+      userConfigForm.setValue('locale', value);
+    },
+    [userConfigForm]
+  );
+
   return {
     shouldShowPresets,
     setShowPresets,
@@ -136,5 +146,7 @@ export function useConfig(): {
     setDrawerOpen,
     theme,
     setTheme,
+    locale,
+    setLocale,
   };
 }

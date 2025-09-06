@@ -9,7 +9,7 @@ export const userConfigSchema = z.object({
   resultView: z.enum(['drawer', 'inline']).default('drawer'),
   isDrawerOpen: z.boolean().default(true),
   shouldShowPresets: z.boolean().default(true),
-  locale: z.string().default('en'),
+  locale: z.string().default('id'),
   theme: z.enum(['light', 'dark', 'system']).default('system'),
 });
 

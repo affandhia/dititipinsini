@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { QueryClientWrapper } from '@/libs/frontend/components/QueryClientWrapper';
+import { ThemeProvider } from '@/libs/frontend/components/ThemeProvider';
 // ...existing code...
 
 import type { Metadata, Viewport } from 'next';
@@ -60,9 +61,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <QueryClientWrapper>{children}</QueryClientWrapper>
+    <html suppressHydrationWarning lang="en">
+      <body className="dark">
+        <ThemeProvider>
+          <QueryClientWrapper>{children}</QueryClientWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

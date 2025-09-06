@@ -1,4 +1,8 @@
 {
+  "navbar": {
+    "calculator": "Calculator",
+    "menu": "Menu"
+  },
   "calculator": {
     "title": "Advanced Cross-Border Calculator",
     "description": "Professional personal shopper cost calculator with multi-currency support",

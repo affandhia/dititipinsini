@@ -1,7 +1,11 @@
 {
   "navbar": {
     "calculator": "Kalkulator",
-    "menu": "Menu"
+    "menu": "Menu",
+    "settings": "Pengaturan"
+  },
+  "app": {
+    "name": "Ditipin Calculator"
   },
   "calculator": {
     "title": "Kalkulator Belanja Lintas Negara",

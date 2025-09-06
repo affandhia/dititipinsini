@@ -1,7 +1,11 @@
 {
   "navbar": {
     "calculator": "Calculator",
-    "menu": "Menu"
+    "menu": "Menu",
+    "settings": "Settings"
+  },
+  "app": {
+    "name": "Ditipin Calculator"
   },
   "calculator": {
     "title": "Advanced Cross-Border Calculator",

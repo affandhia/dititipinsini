@@ -12,23 +12,25 @@ import { Button } from '@/libs/frontend/components/core/button';
 import { Checkbox } from '@/libs/frontend/components/core/checkbox';
 import {
   Collapsible,
-  CollapsibleTrigger,
   CollapsibleContent,
+  CollapsibleTrigger,
 } from '@/libs/frontend/components/core/collapsible';
 import {
   Drawer,
-  DrawerContent,
-  DrawerHeader,
   DrawerClose,
-  DrawerTitle,
+  DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerPortal,
+  DrawerTitle,
+  DrawerTrigger,
 } from '@/libs/frontend/components/core/drawer';
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
 } from '@/libs/frontend/components/core/form';
 import { Input } from '@/libs/frontend/components/core/input';
 import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
@@ -45,9 +47,7 @@ import {
   InputBaseControl,
   InputBaseInput,
 } from './core/input-base';
-import { Label } from './core/label';
 import { Separator } from './core/separator';
-import { Switch } from './core/switch';
 import { CurrencySelector } from './CurrencySelector';
 import { ExchangeRateInput } from './ExchangeRateInput';
 import { FeeInput } from './FeeInput';
@@ -59,7 +59,7 @@ import { useConfig } from './UserConfigProvider';
 const defaultCalculatorValues: CalculatorFormValues = validatedCalculatorConfig;
 
 const CALCULATOR_FORM_VALUES_KEY = 'calculator-form-state';
-const DRAWER_SNAP_POINTS = [0.32, 0.8, 1]; // 50%, 70%, and 100% of screen height
+const DRAWER_SNAP_POINTS = [0.35, 0.5, 1]; // 50%, 70%, and 100% of screen height
 
 export function CalculatorCard() {
   const { t } = useTranslation('common');
@@ -329,7 +329,6 @@ export function CalculatorCard() {
     isDrawerView,
     isInlineView,
     isDrawerOpen,
-    setResultViewMode,
     setDrawerOpen,
   } = useConfig();
 
@@ -391,6 +390,87 @@ export function CalculatorCard() {
                         )}
                       </CollapsibleContent>
                     </Collapsible>
+
+                    <Drawer
+                      modal={false}
+                      open={isDrawerView && isDrawerOpen}
+                      snapPoints={DRAWER_SNAP_POINTS}
+                      onOpenChange={setDrawerOpen}
+                    >
+                      {isDrawerView && !isDrawerOpen && (
+                        <DrawerTrigger className="w-full">
+                          <Button
+                            className="w-full"
+                            type="button"
+                            variant="outline"
+                          >
+                            {t('calculator.actions.viewCostBreakdown', {
+                              defaultValue: 'View Cost Breakdown',
+                            })}
+                          </Button>
+                        </DrawerTrigger>
+                      )}
+
+                      <DrawerPortal>
+                        <DrawerContent className="h-[100%] lg:h-[320px]">
+                          <div className="overflow-y-auto">
+                            <DrawerHeader>
+                              <DrawerTitle>
+                                {t('calculator.results.costBreakdown')}
+                              </DrawerTitle>
+                            </DrawerHeader>
+
+                            <ResultDisplay
+                              className="mx-6"
+                              discountedPrice={
+                                watchedCalculatorValues.discountedPrice
+                              }
+                              exchangeRate={exchangeRate}
+                              fees={fees}
+                              finalTotal={finalTotal}
+                              hasDiscount={watchedCalculatorValues.hasDiscount}
+                              originalPrice={
+                                watchedCalculatorValues.originalPrice
+                              }
+                              sourceCurrency={
+                                watchedCalculatorValues.sourceCurrency
+                              }
+                              subtotal={subtotal}
+                              targetCurrency={
+                                watchedCalculatorValues.targetCurrency
+                              }
+                            />
+
+                            <DrawerFooter className="px-6 pt-6">
+                              <DrawerClose asChild>
+                                <Button type="button" variant="secondary">
+                                  {t('calculator.actions.close', {
+                                    defaultValue: 'Close',
+                                  })}
+                                </Button>
+                              </DrawerClose>
+                            </DrawerFooter>
+                          </div>
+                        </DrawerContent>
+                      </DrawerPortal>
+                    </Drawer>
+
+                    {isInlineView && (
+                      <ResultDisplay
+                        discountedPrice={
+                          watchedCalculatorValues.discountedPrice
+                        }
+                        exchangeRate={exchangeRate}
+                        fees={fees}
+                        finalTotal={finalTotal}
+                        hasDiscount={watchedCalculatorValues.hasDiscount}
+                        originalPrice={watchedCalculatorValues.originalPrice}
+                        sourceCurrency={watchedCalculatorValues.sourceCurrency}
+                        subtotal={subtotal}
+                        targetCurrency={watchedCalculatorValues.targetCurrency}
+                      />
+                    )}
+
                     <div className="rounded-lg border bg-card p-4 text-card-foreground">
                       <h3 className="mb-4 text-lg font-semibold">
                         {t('calculator.sections.itemCurrency')}
@@ -572,95 +652,11 @@ export function CalculatorCard() {
                     {t('calculator.actions.reset')}
                   </Button>
                 </div>
-
-                <div className="flex flex-row items-center justify-between">
-                  <h3 className="text-lg font-medium">
-                    {t('calculator.results.costBreakdown')}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={isDrawerView}
-                        id="drawer-mode"
-                        onCheckedChange={setResultViewMode}
-                      />
-                      <Label htmlFor="drawer-mode">
-                        {t('calculator.fields.drawerMode', {
-                          defaultValue: 'Drawer Mode',
-                        })}
-                      </Label>
-                    </div>
-                    {isDrawerView && !isDrawerOpen && (
-                      <div className="flex justify-center space-x-2">
-                        <Button
-                          className="bg-primary"
-                          size="sm"
-                          onClick={() => setDrawerOpen(true)}
-                        >
-                          {t('calculator.show', { defaultValue: 'Show' })}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {isInlineView && (
-                  <ResultDisplay
-                    discountedPrice={watchedCalculatorValues.discountedPrice}
-                    exchangeRate={exchangeRate}
-                    fees={fees}
-                    finalTotal={finalTotal}
-                    hasDiscount={watchedCalculatorValues.hasDiscount}
-                    originalPrice={watchedCalculatorValues.originalPrice}
-                    sourceCurrency={watchedCalculatorValues.sourceCurrency}
-                    subtotal={subtotal}
-                    targetCurrency={watchedCalculatorValues.targetCurrency}
-                  />
-                )}
               </form>
             </Form>
           </div>
         </div>
       </div>
-
-      {/* Bottom Drawer with Form */}
-      <Drawer
-        modal={false}
-        open={isDrawerView && isDrawerOpen}
-        snapPoints={DRAWER_SNAP_POINTS}
-        onOpenChange={setDrawerOpen}
-      >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{t('calculator.results.costBreakdown')}</DrawerTitle>
-          </DrawerHeader>
-
-          {isDrawerView && (
-            <>
-              <ResultDisplay
-                className="mx-6 overflow-y-auto"
-                discountedPrice={watchedCalculatorValues.discountedPrice}
-                exchangeRate={exchangeRate}
-                fees={fees}
-                finalTotal={finalTotal}
-                hasDiscount={watchedCalculatorValues.hasDiscount}
-                originalPrice={watchedCalculatorValues.originalPrice}
-                sourceCurrency={watchedCalculatorValues.sourceCurrency}
-                subtotal={subtotal}
-                targetCurrency={watchedCalculatorValues.targetCurrency}
-              />
-
-              <DrawerFooter className="px-6 pt-6">
-                <DrawerClose asChild>
-                  <Button type="button" variant="secondary">
-                    {t('calculator.actions.close', { defaultValue: 'Close' })}
-                  </Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </>
-          )}
-        </DrawerContent>
-      </Drawer>
     </>
   );
 }

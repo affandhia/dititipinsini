@@ -5,6 +5,10 @@ import { formatCurrency } from '@/libs/frontend/utils/currency';
 import { useTranslation } from '@/libs/i18n/client';
 
 import { CopyButton } from './CopyButton';
+import { Button } from './core/button';
+import { Label } from './core/label';
+import { Switch } from './core/switch';
+import { useConfig } from './UserConfigProvider';
 
 interface FeeCalculation {
   label: string;
@@ -44,6 +48,9 @@ export function ResultDisplay({
     hasDiscount && discountedPrice > 0 ? discountedPrice : originalPrice;
   const convertedBasePrice = Number(safeNstr(basePrice * exchangeRate));
 
+  const { isDrawerView, isDrawerOpen, setResultViewMode, setDrawerOpen } =
+    useConfig();
+
   return (
     <div
       className={cn(
@@ -54,8 +61,33 @@ export function ResultDisplay({
       <div className="space-y-6">
         {/* ITEM COST Section */}
         <div className="space-y-3">
-          <div className="text-sm font-semibold tracking-wider text-muted-foreground">
-            {t('calculator.results.itemCost')}
+          <div className="flex items-center justify-between text-sm font-semibold tracking-wider text-muted-foreground">
+            <span>{t('calculator.results.itemCost')}</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  checked={isDrawerView}
+                  id="drawer-mode"
+                  onCheckedChange={setResultViewMode}
+                />
+                <Label htmlFor="drawer-mode">
+                  {t('calculator.fields.drawerMode', {
+                    defaultValue: 'Drawer Mode',
+                  })}
+                </Label>
+              </div>
+              {isDrawerView && !isDrawerOpen && (
+                <div className="flex justify-center space-x-2">
+                  <Button
+                    className="bg-primary"
+                    size="sm"
+                    onClick={() => setDrawerOpen(true)}
+                  >
+                    {t('calculator.show', { defaultValue: 'Show' })}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
           <div
             className={cn('space-y-3 pb-3', {

@@ -19,20 +19,18 @@ import {
 } from '@/libs/frontend/components/core/toggle-group';
 import { useTranslation } from '@/libs/i18n/client';
 
-import type { CalculatorFormValues } from '@/schemas/calculatorSchema';
+import type {
+  CalculatorFormValues,
+  FeeSchemaType,
+} from '@/schemas/calculatorSchema';
 import type { Control } from 'react-hook-form';
-
-interface FeePreset {
-  type: 'percentage' | 'fixed';
-  value: number;
-}
 
 interface FeeInputProps {
   control: Control<CalculatorFormValues>;
   name: 'netFee' | 'baggageFee' | 'deliveryFee' | 'packagingFee';
   label: string;
-  presets: FeePreset[];
-  onAddPreset: (preset: FeePreset) => void;
+  presets: FeeSchemaType[];
+  onAddPreset: (preset: FeeSchemaType) => void;
   onRemovePreset: (index: number) => void;
 }
 
@@ -68,7 +66,7 @@ export function FeeInput({
     };
   }, []);
 
-  const handlePresetClick = (preset: FeePreset, index: number) => {
+  const handlePresetClick = (preset: FeeSchemaType, index: number) => {
     if (deleteConfirmIndex === index) {
       // Second click - delete the preset
       onRemovePreset(index);
@@ -147,8 +145,13 @@ export function FeeInput({
                     step="0.01"
                     type="number"
                     {...field}
-                    value={field.value || ''}
-                    onChange={(e) => field.onChange(e.target.value)}
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value?.trim();
+                      field.onChange(
+                        val === '' || val == null ? null : Number(val)
+                      );
+                    }}
                   />
                   <Button
                     size="icon"
@@ -160,7 +163,7 @@ export function FeeInput({
                       const numValue = Number(currentValue);
 
                       if (!isNaN(numValue) && numValue > 0) {
-                        const newPreset: FeePreset = {
+                        const newPreset: FeeSchemaType = {
                           type: currentType,
                           value: numValue,
                         };
@@ -211,8 +214,8 @@ export function FeeInput({
                             onClick={() => handlePresetClick(preset, index)}
                           >
                             {preset.type === 'percentage'
-                              ? `${preset.value}%`
-                              : preset.value.toLocaleString()}
+                              ? `${preset.value ?? 0}%`
+                              : (preset.value ?? 0).toLocaleString()}
                           </Button>
 
                           {/* Delete button/icon */}

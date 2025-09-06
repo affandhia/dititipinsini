@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const feeSchema = z.object({
   type: z.enum(['percentage', 'fixed']),
-  value: z.coerce.number().min(0, 'Value cannot be negative.'),
+  value: z.coerce.number().min(0, 'Value cannot be negative.').nullable(),
 });
 
 export const userConfigSchema = z.object({
@@ -39,5 +39,6 @@ export const calculatorSchema = z.object({
   packagingFeePresets: z.array(feeSchema),
 });
 
+export type FeeSchemaType = z.infer<typeof feeSchema>;
 export type UserConfigFormValues = z.infer<typeof userConfigSchema>;
 export type CalculatorFormValues = z.infer<typeof calculatorSchema>;

@@ -35,6 +35,7 @@ import {
 } from '@/libs/frontend/components/core/form';
 import { Input } from '@/libs/frontend/components/core/input';
 import { useCurrencyApi } from '@/libs/frontend/hooks/useCurrencyApi';
+import { safeNstr } from '@/libs/frontend/utils';
 import { useTranslation } from '@/libs/i18n/client';
 import {
   CalculatorFormValues,
@@ -146,7 +147,7 @@ export function CalculatorCard() {
         exchangeRateData[
           watchedCalculatorValues.sourceCurrency.toLowerCase()
         ]?.[watchedCalculatorValues.targetCurrency.toLowerCase()];
-      calculatorForm.setValue('exchangeRate', Number(nstr(apiRate)));
+      calculatorForm.setValue('exchangeRate', Number(safeNstr(apiRate, 1)));
     }
   }, [
     exchangeRateData,
@@ -164,7 +165,7 @@ export function CalculatorCard() {
           watchedCalculatorValues.targetCurrency.toLowerCase()
         ];
       if (apiRate) {
-        calculatorForm.setValue('exchangeRate', Number(nstr(apiRate)));
+        calculatorForm.setValue('exchangeRate', Number(safeNstr(apiRate, 1)));
       }
     }
   };
@@ -185,23 +186,29 @@ export function CalculatorCard() {
       | 'baggageFeePresets'
       | 'deliveryFeePresets'
       | 'packagingFeePresets',
-    value: number | { type: 'fixed' | 'percentage'; value: number }
+    value: number | { type: 'fixed' | 'percentage'; value: number | null }
   ) => {
     const currentPresets = calculatorForm.getValues(field);
 
     if (field === 'originalPricePresets') {
-      calculatorForm.setValue(field, [
-        ...(currentPresets as number[]),
-        value as number,
-      ]);
+      // For originalPrice, value should be a number
+      if (typeof value === 'number') {
+        calculatorForm.setValue(field, [
+          ...(currentPresets as number[]),
+          value,
+        ]);
+      }
     } else {
-      calculatorForm.setValue(field, [
-        ...(currentPresets as {
-          type: 'fixed' | 'percentage';
-          value: number;
-        }[]),
-        value as { type: 'fixed' | 'percentage'; value: number },
-      ]);
+      // For fee presets, check if value.value is not null before adding
+      if (typeof value === 'object' && value.value !== null) {
+        calculatorForm.setValue(field, [
+          ...(currentPresets as {
+            type: 'fixed' | 'percentage';
+            value: number;
+          }[]),
+          { type: value.type, value: value.value },
+        ]);
+      }
     }
   };
 
@@ -262,32 +269,32 @@ export function CalculatorCard() {
     const netFeeAmount = Number(
       nstr(
         netFee.type === 'percentage'
-          ? (convertedBasePrice * netFee.value) / 100
-          : netFee.value
+          ? (convertedBasePrice * (netFee.value ?? 0)) / 100
+          : (netFee.value ?? 0)
       )
     );
 
     const baggageFeeAmount = Number(
       nstr(
         baggageFee.type === 'percentage'
-          ? (convertedBasePrice * baggageFee.value) / 100
-          : baggageFee.value
+          ? (convertedBasePrice * (baggageFee.value ?? 0)) / 100
+          : (baggageFee.value ?? 0)
       )
     );
 
     const deliveryFeeAmount = Number(
       nstr(
         deliveryFee.type === 'percentage'
-          ? (convertedBasePrice * deliveryFee.value) / 100
-          : deliveryFee.value
+          ? (convertedBasePrice * (deliveryFee.value ?? 0)) / 100
+          : (deliveryFee.value ?? 0)
       )
     );
 
     const packagingFeeAmount = Number(
       nstr(
         packagingFee.type === 'percentage'
-          ? (convertedBasePrice * packagingFee.value) / 100
-          : packagingFee.value
+          ? (convertedBasePrice * (packagingFee.value ?? 0)) / 100
+          : (packagingFee.value ?? 0)
       )
     );
 
@@ -297,7 +304,7 @@ export function CalculatorCard() {
         amount: netFeeAmount,
         displayValue:
           netFee.type === 'percentage'
-            ? `${nstr(netFee.value)}%`
+            ? `${nstr(netFee.value ?? 0)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
       {
@@ -305,7 +312,7 @@ export function CalculatorCard() {
         amount: baggageFeeAmount,
         displayValue:
           baggageFee.type === 'percentage'
-            ? `${nstr(baggageFee.value)}%`
+            ? `${nstr(baggageFee.value ?? 0)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
       {
@@ -313,7 +320,7 @@ export function CalculatorCard() {
         amount: deliveryFeeAmount,
         displayValue:
           deliveryFee.type === 'percentage'
-            ? `${nstr(deliveryFee.value)}%`
+            ? `${nstr(deliveryFee.value ?? 0)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
       {
@@ -321,7 +328,7 @@ export function CalculatorCard() {
         amount: packagingFeeAmount,
         displayValue:
           packagingFee.type === 'percentage'
-            ? `${nstr(packagingFee.value)}%`
+            ? `${nstr(packagingFee.value ?? 0)}%`
             : `${t('calculator.feeTypes.fixed')}`,
       },
     ];

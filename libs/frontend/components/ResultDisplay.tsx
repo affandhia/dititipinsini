@@ -1,17 +1,15 @@
 'use client';
 
 import { ChevronsUpDown } from 'lucide-react';
-import nstr from 'nstr';
 
 import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
 } from '@/libs/frontend/components/core/collapsible';
+import { cn, safeNstr } from '@/libs/frontend/utils';
 import { formatCurrency } from '@/libs/frontend/utils/currency';
 import { useTranslation } from '@/libs/i18n/client';
-
-import { cn } from '../utils';
 
 import { CopyButton } from './CopyButton';
 
@@ -82,7 +80,7 @@ export function ResultDisplay({
               targetCurrency,
             })}
           </span>
-          <span>{nstr(exchangeRate)}</span>
+          <span>{safeNstr(exchangeRate)}</span>
         </div>
 
         {/* Converted Base Price */}
@@ -91,7 +89,7 @@ export function ResultDisplay({
           <span className="font-medium">
             {formatCurrency(
               Number(
-                nstr(
+                safeNstr(
                   (hasDiscount && discountedPrice > 0
                     ? discountedPrice
                     : originalPrice) * exchangeRate
@@ -111,7 +109,9 @@ export function ResultDisplay({
               <span className="font-semibold">
                 {t('calculator.results.fees', { defaultValue: 'Total Fee:' })}{' '}
                 {formatCurrency(
-                  Number(nstr(fees.reduce((acc, fee) => acc + fee.amount, 0))),
+                  Number(
+                    safeNstr(fees.reduce((acc, fee) => acc + fee.amount, 0))
+                  ),
                   targetCurrency
                 )}
               </span>

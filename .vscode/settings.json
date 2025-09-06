@@ -34,6 +34,11 @@
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Strictly generate a commit message that follows the Conventional Commits specification. The entire commit message must be a single line.\n\nThe format is: `type(scope): subject`\n\n**1. Type:**\n- Must be one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.\n\n**2. Scope (optional):**\n- Enclosed in parentheses, describing the section of the codebase affected (e.g., `api`, `auth`, `ui`).\n\n**3. Subject:**\n- Begins immediately after the colon and space.\n- Must start with a lowercase letter.\n- Must be written in the imperative mood (e.g., \"add\", \"fix\", \"refactor\", \"update\").\n- Should be a concise summary of the changes.\n- Do not end the subject with a period.\n\n---\n\n**Examples of GOOD commit messages:**\n- `feat(api): add new endpoint for user profile`\n- `fix(auth): resolve login redirect issue`\n- `docs(readme): update installation instructions`\n- `refactor(ui): simplify button component logic`\n\n**Examples of BAD commit messages:**\n- `fixed a bug` (Incorrect: Missing type and scope, wrong tense)\n- `feat: Added new endpoint.` (Incorrect: Subject is not in imperative mood, starts with uppercase, ends with period)\n- `fix(api) resolve login issue` (Incorrect: Missing colon)\n- `docs: update README` (Incorrect: Subject should start with lowercase letter)"
+    }
+  ],
   "files.associations": {
     "*.css": "css",
     "*.scss": "scss",

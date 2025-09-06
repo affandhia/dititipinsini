@@ -46,6 +46,7 @@ import {
   InputBaseInput,
 } from './core/input-base';
 import { Label } from './core/label';
+import { Separator } from './core/separator';
 import { Switch } from './core/switch';
 import { CurrencySelector } from './CurrencySelector';
 import { ExchangeRateInput } from './ExchangeRateInput';
@@ -492,17 +493,23 @@ export function CalculatorCard() {
                           name="netFee"
                         />
 
+                        <Separator />
+
                         <FeeInput
                           control={calculatorForm.control}
                           label={t('calculator.fields.baggageFee')}
                           name="baggageFee"
                         />
 
+                        <Separator />
+
                         <FeeInput
                           control={calculatorForm.control}
                           label={t('calculator.fields.deliveryFee')}
                           name="deliveryFee"
                         />
+
+                        <Separator />
 
                         <FeeInput
                           control={calculatorForm.control}

@@ -28,6 +28,12 @@ export const calculatorSchema = z.object({
   exchangeRate: z.coerce.number().positive('Exchange rate must be positive.'),
   sourceCurrencyList: z.array(z.string()),
   targetCurrencyList: z.array(z.string()),
+
+  withNetFee: z.boolean().default(false),
+  withBaggageFee: z.boolean().default(false),
+  withDeliveryFee: z.boolean().default(false),
+  withPackagingFee: z.boolean().default(false),
+
   netFee: feeSchema,
   baggageFee: feeSchema,
   deliveryFee: feeSchema,

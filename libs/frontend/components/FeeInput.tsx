@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from '@/libs/frontend/components/core/form';
 import { Input } from '@/libs/frontend/components/core/input';
+import { Switch } from '@/libs/frontend/components/core/switch';
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -90,15 +91,48 @@ export function FeeInput({
     }
   };
 
+  // Get the value of the relevant with*Fee field
+  const withFee = getValues(
+    name === 'netFee'
+      ? 'withNetFee'
+      : name === 'baggageFee'
+        ? 'withBaggageFee'
+        : name === 'deliveryFee'
+          ? 'withDeliveryFee'
+          : 'withPackagingFee'
+  );
+
   return (
     <div ref={containerRef} className="space-y-4">
-      <div className="font-medium">{label}</div>
+      {/* Toggle for enabling/disabling this fee */}
+      <FormField
+        control={control}
+        name={
+          name === 'netFee'
+            ? 'withNetFee'
+            : name === 'baggageFee'
+              ? 'withBaggageFee'
+              : name === 'deliveryFee'
+                ? 'withDeliveryFee'
+                : 'withPackagingFee'
+        }
+        render={({ field }) => (
+          <div className="mb-2 flex items-center gap-2">
+            <Switch
+              checked={field.value}
+              id={`switch-${name}`}
+              onCheckedChange={field.onChange}
+            />
+            <span className="font-medium">{label}</span>
+          </div>
+        )}
+      />
 
       <FormField
         control={control}
         name={`${name}.type`}
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={withFee ? '' : 'hidden'}>
             <FormLabel>{t('calculator.forms.labels.feeType')}</FormLabel>
             <FormControl>
               <ToggleGroup
@@ -134,7 +168,7 @@ export function FeeInput({
         control={control}
         name={`${name}.value`}
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={withFee ? '' : 'hidden'}>
             <FormLabel>{t('calculator.forms.labels.value')}</FormLabel>
             <FormControl>
               <div className="space-y-3">

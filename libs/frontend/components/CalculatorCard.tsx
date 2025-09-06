@@ -286,6 +286,29 @@ export function CalculatorCard() {
 
   const { subtotal, finalTotal, fees } = calculateTotal();
 
+  // Check if any fees are enabled
+  const anyFeesEnabled =
+    watchedCalculatorValues.withNetFee ||
+    watchedCalculatorValues.withBaggageFee ||
+    watchedCalculatorValues.withDeliveryFee ||
+    watchedCalculatorValues.withPackagingFee;
+
+  // Function to apply all fees
+  const handleApplyAllFees = () => {
+    calculatorForm.setValue('withNetFee', true);
+    calculatorForm.setValue('withBaggageFee', true);
+    calculatorForm.setValue('withDeliveryFee', true);
+    calculatorForm.setValue('withPackagingFee', true);
+  };
+
+  // Function to clear all fees
+  const handleClearAllFees = () => {
+    calculatorForm.setValue('withNetFee', false);
+    calculatorForm.setValue('withBaggageFee', false);
+    calculatorForm.setValue('withDeliveryFee', false);
+    calculatorForm.setValue('withPackagingFee', false);
+  };
+
   const onSubmit = (data: CalculatorFormValues) => {
     // Save form values to localStorage on submit
     storeCalculatorValues(data);
@@ -482,9 +505,29 @@ export function CalculatorCard() {
                   {/* Right Column - Fees */}
                   <div className="space-y-6">
                     <div className="rounded-lg border bg-card p-4 text-card-foreground">
-                      <h3 className="mb-4 text-lg font-semibold">
-                        {t('calculator.sections.feesCharges')}
-                      </h3>
+                      <div className="mb-4 flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">
+                          {t('calculator.sections.feesCharges')}
+                        </h3>
+                        <Button
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                          onClick={
+                            anyFeesEnabled
+                              ? handleClearAllFees
+                              : handleApplyAllFees
+                          }
+                        >
+                          {anyFeesEnabled
+                            ? t('calculator.actions.clear', {
+                                defaultValue: 'Clear',
+                              })
+                            : t('calculator.actions.apply', {
+                                defaultValue: 'Apply',
+                              })}
+                        </Button>
+                      </div>
 
                       <div className="space-y-6">
                         <FeeInput

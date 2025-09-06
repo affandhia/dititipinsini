@@ -34,7 +34,9 @@
       "reset": "Reset",
       "copyResults": "Copy Results",
       "copied": "Copied!",
-      "copyFailed": "Copy failed"
+      "copyFailed": "Copy failed",
+      "apply": "Apply",
+      "clear": "Clear"
     },
     "status": {
       "loadingExchangeRates": "Loading exchange rates..."

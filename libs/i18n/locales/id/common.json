@@ -34,7 +34,9 @@
       "reset": "Reset",
       "copyResults": "Salin Hasil",
       "copied": "Tersalin!",
-      "copyFailed": "Gagal menyalin"
+      "copyFailed": "Gagal menyalin",
+      "apply": "Terapkan",
+      "clear": "Bersihkan"
     },
     "status": {
       "loadingExchangeRates": "Lagi memuat data kurs..."

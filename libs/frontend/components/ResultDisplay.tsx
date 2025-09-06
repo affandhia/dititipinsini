@@ -57,7 +57,12 @@ export function ResultDisplay({
           <div className="text-sm font-semibold tracking-wider text-muted-foreground">
             {t('calculator.results.itemCost')}
           </div>
-          <div className="space-y-3 border-b border-dashed border-muted-foreground/30 pb-3">
+          <div
+            className={cn('space-y-3 pb-3', {
+              'border-b border-dashed border-muted-foreground/30':
+                fees.length > 0,
+            })}
+          >
             {/* Original Price */}
             <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0">
               <span className="text-sm sm:text-base">
@@ -104,29 +109,31 @@ export function ResultDisplay({
         </div>
 
         {/* SERVICE & LOGISTICS Section */}
-        <div className="space-y-3">
-          <div className="text-sm font-semibold tracking-wider text-muted-foreground">
-            {t('calculator.results.serviceLogistics')}
-          </div>
-          <div className="space-y-3 pb-3">
-            {fees.map((fee) => (
-              <div
-                key={fee.label}
-                className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0"
-              >
-                <span className="text-sm sm:text-base">{fee.label}</span>
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
-                  <span className="text-base font-medium">
-                    {formatCurrency(fee.amount, targetCurrency)}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {`(${fee.displayValue})`}
-                  </span>
+        {fees.length > 0 && (
+          <div className="space-y-3">
+            <div className="text-sm font-semibold tracking-wider text-muted-foreground">
+              {t('calculator.results.serviceLogistics')}
+            </div>
+            <div className="space-y-3 pb-3">
+              {fees.map((fee) => (
+                <div
+                  key={fee.label}
+                  className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0"
+                >
+                  <span className="text-sm sm:text-base">{fee.label}</span>
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                    <span className="text-base font-medium">
+                      {formatCurrency(fee.amount, targetCurrency)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {`(${fee.displayValue})`}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* TOTAL TO PAY Section */}
         <div className="border-t-2 border-primary/20 pt-4">

@@ -7,6 +7,9 @@
       "feesCharges": "Biaya & Ongkos",
       "config": "Konfigurasi"
     },
+    "config": {
+      "title": "Konfigurasi Pengguna"
+    },
     "fields": {
       "originalPrice": "Harga Asli",
       "hasDiscount": "Pakai Diskon",
@@ -18,7 +21,9 @@
       "netFee": "Biaya Jastip (Fee)",
       "baggageFee": "Biaya Bagasi",
       "deliveryFee": "Ongkos Kirim (Ongkir)",
-      "packagingFee": "Biaya Packing"
+      "packagingFee": "Biaya Packing",
+      "shouldShowPresets": "Tampilkan Preset",
+      "drawerMode": "Mode Drawer"
     },
     "actions": {
       "calculateTotal": "Hitung Total",
@@ -37,6 +42,7 @@
       "exchangeRate": "Kurs Tukar ({{sourceCurrency}} → {{targetCurrency}}):",
       "convertedBasePrice": "Harga Dasar (Setelah Konversi):",
       "subtotal": "Subtotal:",
+      "fees": "Total Biaya:",
       "finalTotal": "Total Akhir:"
     },
     "feeTypes": {

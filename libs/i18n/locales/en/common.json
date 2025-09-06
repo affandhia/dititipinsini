@@ -7,6 +7,9 @@
       "feesCharges": "Fees & Charges",
       "config": "Configuration"
     },
+    "config": {
+      "title": "User Config"
+    },
     "fields": {
       "originalPrice": "Original Price",
       "hasDiscount": "Apply Discount",
@@ -18,7 +21,9 @@
       "netFee": "Net Fee",
       "baggageFee": "Baggage Fee",
       "deliveryFee": "Delivery Fee",
-      "packagingFee": "Packaging Fee"
+      "packagingFee": "Packaging Fee",
+      "shouldShowPresets": "Show Presets",
+      "drawerMode": "Drawer Mode"
     },
     "actions": {
       "calculateTotal": "Calculate Total",
@@ -37,6 +42,7 @@
       "exchangeRate": "Exchange Rate ({{sourceCurrency}} → {{targetCurrency}}):",
       "convertedBasePrice": "Converted Base Price:",
       "subtotal": "Subtotal:",
+      "fees": "Total Fee:",
       "finalTotal": "Final Total:"
     },
     "feeTypes": {

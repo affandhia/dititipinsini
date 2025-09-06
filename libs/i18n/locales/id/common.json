@@ -47,7 +47,10 @@
       "convertedBasePrice": "Harga Dasar (Setelah Konversi):",
       "subtotal": "Subtotal:",
       "fees": "Total Biaya:",
-      "finalTotal": "Total Akhir:"
+      "finalTotal": "Total Akhir:",
+      "itemCost": "BIAYA BARANG",
+      "serviceLogistics": "LAYANAN & LOGISTIK",
+      "totalToPay": "Total yang Harus Dibayar"
     },
     "feeTypes": {
       "fixed": "Fixed",

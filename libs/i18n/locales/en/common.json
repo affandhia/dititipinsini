@@ -47,7 +47,10 @@
       "convertedBasePrice": "Converted Base Price:",
       "subtotal": "Subtotal:",
       "fees": "Total Fee:",
-      "finalTotal": "Final Total:"
+      "finalTotal": "Final Total:",
+      "itemCost": "ITEM COST",
+      "serviceLogistics": "SERVICE & LOGISTICS",
+      "totalToPay": "Total to Pay"
     },
     "feeTypes": {
       "fixed": "Fixed",

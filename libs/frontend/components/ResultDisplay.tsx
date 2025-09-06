@@ -1,12 +1,5 @@
 'use client';
 
-import { ChevronsUpDown } from 'lucide-react';
-
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from '@/libs/frontend/components/core/collapsible';
 import { cn, safeNstr } from '@/libs/frontend/utils';
 import { formatCurrency } from '@/libs/frontend/utils/currency';
 import { useTranslation } from '@/libs/i18n/client';
@@ -40,11 +33,16 @@ export function ResultDisplay({
   targetCurrency,
   exchangeRate,
   fees,
-  subtotal,
+  subtotal: _subtotal,
   finalTotal,
   className,
 }: ResultDisplayProps) {
   const { t } = useTranslation('common');
+
+  // Calculate converted base price
+  const basePrice =
+    hasDiscount && discountedPrice > 0 ? discountedPrice : originalPrice;
+  const convertedBasePrice = Number(safeNstr(basePrice * exchangeRate));
 
   return (
     <div
@@ -53,119 +51,101 @@ export function ResultDisplay({
         'rounded-lg border bg-card p-6 text-card-foreground'
       )}
     >
-      <div className="space-y-3">
-        {/* Original Price */}
-        <div className="flex justify-between">
-          <span>{t('calculator.results.originalPrice')}</span>
-          <span className="font-medium">
-            {formatCurrency(originalPrice, sourceCurrency)}
-          </span>
-        </div>
-
-        {/* Discounted Price - show only if discount is applied */}
-        {hasDiscount && discountedPrice > 0 && (
-          <div className="flex justify-between">
-            <span>{t('calculator.results.discountedPrice')}</span>
-            <span className="font-medium text-green-600">
-              {formatCurrency(discountedPrice, sourceCurrency)}
-            </span>
+      <div className="space-y-6">
+        {/* ITEM COST Section */}
+        <div className="space-y-3">
+          <div className="text-sm font-semibold tracking-wider text-muted-foreground">
+            {t('calculator.results.itemCost')}
           </div>
-        )}
-
-        {/* Exchange Rate */}
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>
-            {t('calculator.results.exchangeRate', {
-              sourceCurrency,
-              targetCurrency,
-            })}
-          </span>
-          <span>{safeNstr(exchangeRate)}</span>
-        </div>
-
-        {/* Converted Base Price */}
-        <div className="flex justify-between">
-          <span>{t('calculator.results.convertedBasePrice')}</span>
-          <span className="font-medium">
-            {formatCurrency(
-              Number(
-                safeNstr(
-                  (hasDiscount && discountedPrice > 0
-                    ? discountedPrice
-                    : originalPrice) * exchangeRate
-                )
-              ),
-              targetCurrency
-            )}
-          </span>
-        </div>
-
-        <hr className="my-4" />
-
-        {/* Fees (Collapsible) */}
-        <Collapsible defaultOpen>
-          <CollapsibleTrigger asChild>
-            <div className="flex cursor-pointer items-center justify-between py-2 select-none">
-              <span className="font-semibold">
-                {t('calculator.results.fees', { defaultValue: 'Total Fee:' })}{' '}
-                {formatCurrency(
-                  Number(
-                    safeNstr(fees.reduce((acc, fee) => acc + fee.amount, 0))
-                  ),
-                  targetCurrency
-                )}
+          <div className="space-y-3 border-b border-dashed border-muted-foreground/30 pb-3">
+            {/* Original Price */}
+            <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0">
+              <span className="text-sm sm:text-base">
+                {t('calculator.results.originalPrice')}
               </span>
-              <ChevronsUpDown size="14" />
-              <span className="sr-only">{'Toggle'}</span>
+              <span className="text-base font-medium">
+                {formatCurrency(originalPrice, sourceCurrency)}
+              </span>
             </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3">
-            {fees.map((fee) => (
-              <div key={fee.label} className="flex justify-between">
-                <span>{`${fee.label}:`}</span>
-                <span className="font-medium">
-                  {formatCurrency(fee.amount, targetCurrency)}
-                  <span className="ml-2 text-sm text-muted-foreground">
-                    {`(${fee.displayValue})`}
-                  </span>
+
+            {/* Discounted Price - show only if discount is applied */}
+            {hasDiscount && discountedPrice > 0 && (
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0">
+                <span className="text-sm sm:text-base">
+                  {t('calculator.results.discountedPrice')}
+                </span>
+                <span className="text-base font-medium text-green-600">
+                  {formatCurrency(discountedPrice, sourceCurrency)}
                 </span>
               </div>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+            )}
 
-        <hr className="my-4" />
+            {/* Exchange Rate - shown as info */}
+            <div className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:justify-between sm:gap-0">
+              <span>
+                {t('calculator.results.exchangeRate', {
+                  sourceCurrency,
+                  targetCurrency,
+                })}
+              </span>
+              <span>{safeNstr(exchangeRate)}</span>
+            </div>
 
-        {/* Subtotal */}
-        <div className="flex justify-between text-lg">
-          <span className="font-semibold">
-            {t('calculator.results.subtotal')}
-          </span>
-          <span className="font-semibold">
-            {formatCurrency(subtotal, targetCurrency)}
-          </span>
-          <CopyButton
-            className="h-8 px-3"
-            size="sm"
-            textToCopy={subtotal.toString()}
-            variant="ghost"
-          />
+            {/* Converted Base Price */}
+            <div className="flex flex-col gap-1 font-medium sm:flex-row sm:justify-between sm:gap-0">
+              <span className="text-sm sm:text-base">
+                {t('calculator.results.convertedBasePrice')}
+              </span>
+              <span className="text-base">
+                {formatCurrency(convertedBasePrice, targetCurrency)}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Final Total */}
-        <div className="flex justify-between border-t pt-3 text-xl">
-          <span className="font-bold">
-            {t('calculator.results.finalTotal')}
-          </span>
-          <span className="font-bold text-primary">
-            {formatCurrency(finalTotal, targetCurrency)}
-          </span>
-          <CopyButton
-            className="h-8 px-3"
-            size="sm"
-            textToCopy={finalTotal.toString()}
-            variant="ghost"
-          />
+        {/* SERVICE & LOGISTICS Section */}
+        <div className="space-y-3">
+          <div className="text-sm font-semibold tracking-wider text-muted-foreground">
+            {t('calculator.results.serviceLogistics')}
+          </div>
+          <div className="space-y-3 pb-3">
+            {fees.map((fee) => (
+              <div
+                key={fee.label}
+                className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0"
+              >
+                <span className="text-sm sm:text-base">{fee.label}</span>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                  <span className="text-base font-medium">
+                    {formatCurrency(fee.amount, targetCurrency)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {`(${fee.displayValue})`}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* TOTAL TO PAY Section */}
+        <div className="border-t-2 border-primary/20 pt-4">
+          <div className="flex items-center justify-between text-xl">
+            <span className="font-bold text-primary">
+              {t('calculator.results.totalToPay')}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-primary">
+                {formatCurrency(finalTotal, targetCurrency)}
+              </span>
+              <CopyButton
+                className="h-8 px-3"
+                size="sm"
+                textToCopy={finalTotal.toString()}
+                variant="ghost"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
